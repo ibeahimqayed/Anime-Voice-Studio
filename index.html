@@ -117,7 +117,10 @@
             <button data-emotion="Calm">❄️ هدوء</button>
             <button data-emotion="Sad">☁ حزن</button>
           </div>
-          <div class="range-block"><div><label for="intensity">قوة المشاعر</label><output id="intensityOut">70%</output></div><input type="range" id="intensity" min="0" max="100" value="70" /></div>
+          <label class="field-label" for="performanceDirection">توجيه الأداء المسرحي — اختياري (Drama 3)</label>
+          <textarea id="performanceDirection" rows="3" maxlength="320" spellcheck="false" placeholder="مثال: بصوت عميق، ملكي ومهيب، ببطء محسوب، مع وقفات درامية قصيرة ودون صراخ"></textarea>
+          <p class="inline-note">إذا كتبت توجيهًا هنا، سيتقدم على النمط الجاهز. ويمكنك أيضًا وضع توجيهات مثل [cold, restrained anger] داخل النص نفسه. النتيجة تعتمد على الصوت والنموذج، ولا يمكن ضمان أداء محدد.</p>
+          <div class="range-block"><div><label for="intensity">شدة التوجيه التمثيلي (تقريبية)</label><output id="intensityOut">70%</output></div><input type="range" id="intensity" min="0" max="100" value="70" /></div>
           <div class="range-block"><div><label for="volume">قوة الصوت (ليست المشاعر)</label><output id="volumeOut">40%</output></div><input type="range" id="volume" min="0" max="100" value="40" /></div>
           <div class="range-block"><div><label for="speed">سرعة النطق</label><output id="speedOut">1.0×</output></div><input type="range" id="speed" min="60" max="140" value="100" step="5" /></div>
           <label class="field-label" for="draftName">اسم المشهد للحفظ</label>
@@ -426,6 +429,8 @@ window.AVS_CONFIG = {
       data.set('reference_id', fishVoice.id);
       data.set('language', state.language);
       data.set('emotion', state.emotion);
+      data.set('intensity', $('intensity').value);
+      data.set('direction', $('performanceDirection').value.trim());
       data.set('speed', (+$('speed').value / 100).toFixed(2));
       return data;
     };
@@ -739,6 +744,11 @@ window.AVS_CONFIG = {
   for (const [id, output, unit] of [['intensity','intensityOut','%'],['volume','volumeOut','%'],['speed','speedOut','×']]) {
     $(id).addEventListener('input', () => { $(output).textContent = (id === 'speed' ? (Number($(id).value) / 100).toFixed(2) : $(id).value) + unit; });
   }
+  const performanceDirectionKey = 'avs_performance_direction_v1';
+  try { $('performanceDirection').value = localStorage.getItem(performanceDirectionKey) || ''; } catch (_) {}
+  $('performanceDirection').addEventListener('input', () => {
+    try { localStorage.setItem(performanceDirectionKey, $('performanceDirection').value); } catch (_) {}
+  });
   $('scriptInput').addEventListener('input', () => $('charCount').textContent = $('scriptInput').value.length + ' / 1200');
   $('saveDraftBtn').addEventListener('click', async () => {
     if (!checkAuth()) return;
