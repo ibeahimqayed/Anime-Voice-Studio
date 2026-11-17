@@ -40,7 +40,7 @@
   <div class="app-shell">
     <header class="topbar">
       <div class="brand-logo" aria-hidden="true"><span>AV</span><i></i></div>
-      <div class="brand-text"><b>ANIME VOICE</b><small>STUDIO · iPhone v0.6</small></div>
+      <div class="brand-text"><b>ANIME VOICE</b><small>STUDIO · Fish Clone & 2 Takes</small></div>
       <div id="cloudIndicator" class="status-pill">وضع التجربة</div>
     </header>
 
@@ -75,11 +75,30 @@
             <button data-lang="ja" class="selected">🇯🇵 日本語</button><button data-lang="en">🇺🇸 English</button><button data-lang="ar">🇸🇦 العربية</button>
           </div>
           <label class="field-label" for="scriptInput">النص</label>
-          <textarea id="scriptInput" placeholder="اكتب حوار الشخصية هنا..." rows="5" maxlength="3000" spellcheck="false"></textarea>
-          <div class="field-meta"><span id="charCount">0 / 3000</span><span id="languageTip">Japanese script</span></div>
+          <textarea id="scriptInput" placeholder="اكتب حوار الشخصية هنا..." rows="5" maxlength="1200" spellcheck="false"></textarea>
+          <div class="field-meta"><span id="charCount">0 / 1200</span><span id="languageTip">Japanese script</span></div>
           <label class="field-label" for="voiceSelect">اختر الصوت — Fish Audio</label>
           <select id="voiceSelect"><option value="">جاري تحميل الأصوات...</option></select>
           <p class="inline-note">الصوت المحدد يُستخدم في التوليد. تُحفظ قائمة أصوات Fish محليًا على هذا الجهاز.</p>
+          <div class="form-card" style="margin-top:10px;padding:12px">
+            <b>🎙️ استنساخ صوت جديد من تسجيل أو فيديو</b>
+            <p class="inline-note">اختر عينة تحتوي على متحدث واحد وصوت واضح. سيستخرج التطبيق 25 ثانية كحد أقصى بدءًا من الوقت الذي تحدده، ويحفظ الصوت بشكل خاص في حساب Fish Audio المرتبط بمفتاح الخادم.</p>
+            <label class="field-label" for="cloneVoiceName">اسم الصوت الجديد</label>
+            <input id="cloneVoiceName" maxlength="60" placeholder="مثل: شخصية أنمي جديدة" />
+            <label class="field-label" for="cloneSourceFile">ملف صوت أو فيديو (WAV / MP3 / M4A / MP4 / MOV — حتى 30MB)</label>
+            <input id="cloneSourceFile" type="file" accept="audio/*,video/mp4,video/quicktime,video/x-m4v,.wav,.mp3,.m4a,.opus,.mp4,.mov,.m4v" />
+            <p id="cloneFileInfo" class="inline-note" aria-live="polite">لم يتم اختيار ملف بعد.</p>
+            <video id="cloneVideoPreview" controls playsinline hidden style="width:100%;max-height:200px;margin:8px 0"></video>
+            <audio id="cloneAudioPreview" controls hidden style="width:100%;margin:8px 0"></audio>
+            <label class="field-label" for="cloneStart">بداية العينة (ثانية)</label>
+            <input id="cloneStart" type="number" inputmode="decimal" min="0" step="1" value="0" />
+            <label style="display:flex;gap:8px;align-items:flex-start;margin:12px 0;font-size:13px;line-height:1.7">
+              <input type="checkbox" id="cloneConsent" style="margin-top:5px" />
+              <span>أؤكد أن لدي إذنًا باستخدام هذا التسجيل واستنساخ الصوت.</span>
+            </label>
+            <button type="button" id="createFishVoiceBtn" class="btn primary full">◉ استنساخ الصوت وحفظه</button>
+            <p id="cloneStatus" class="inline-note" role="status" aria-live="polite">سيظل الفيديو على جهازك أثناء استخراج الصوت، وتُرسل عينة WAV فقط إلى Fish Audio عبر الخادم.</p>
+          </div>
           <div class="form-card" style="margin-top:10px;padding:12px">
             <b>＋ إضافة صوت محفوظ من Fish Audio</b>
             <label class="field-label" for="fishVoiceName">اسم الصوت</label>
@@ -104,22 +123,31 @@
           <label class="field-label" for="draftName">اسم المشهد للحفظ</label>
           <input id="draftName" maxlength="80" placeholder="مثل: إعلان التحدي" />
           <button class="btn primary full" id="saveDraftBtn">حفظ المشهد في المكتبة</button>
-          <button class="btn primary full" id="generateBtn" type="button">◉ توليد الصوت من النص</button>
+          <button class="btn primary full" id="generateBtn" type="button">◉ توليد نسختين من الصوت</button>
+          <p class="inline-note">كل ضغطة تُرسل طلبي توليد مستقلين إلى Fish Audio؛ قد يترتب عليهما ضعف تكلفة توليد نسخة واحدة.</p>
           <p class="inline-note" id="generationStatus" role="status" aria-live="polite">اربط خادم الصوت من تبويب الحساب. بعد الربط يمكنك كتابة النص واختيار الصوت المحفوظ لتوليد تسجيل WAV.</p>
           <div id="generationResult" class="generation-result" hidden>
-            <b>الصوت المولّد</b>
-            <audio id="generatedAudio" controls preload="none"></audio>
-            <a class="btn outline full download-btn" id="downloadGenerated" download="anime-voice.wav">↓ حفظ التسجيل WAV</a>
-            <p class="inline-note">التسجيل الناتج للاستخدام الشخصي المصرّح به؛ وقد تختلف نبرة المشاعر عن الاختيار.</p>
+            <b>اختر النتيجة التي تفضلها</b>
+            <div id="generatedBox1" class="form-card" style="margin:10px 0;padding:12px" hidden>
+              <b>🎧 النتيجة الأولى</b>
+              <audio id="generatedAudio1" controls preload="none" style="width:100%;margin:9px 0"></audio>
+              <a class="btn outline full download-btn" id="downloadGenerated1" download="anime-voice-1.wav">↓ حفظ النتيجة الأولى WAV</a>
+            </div>
+            <div id="generatedBox2" class="form-card" style="margin:10px 0;padding:12px" hidden>
+              <b>🎧 النتيجة الثانية</b>
+              <audio id="generatedAudio2" controls preload="none" style="width:100%;margin:9px 0"></audio>
+              <a class="btn outline full download-btn" id="downloadGenerated2" download="anime-voice-2.wav">↓ حفظ النتيجة الثانية WAV</a>
+            </div>
+            <p class="inline-note">كل نتيجة مولدة بشكل مستقل، وقد تختلف النبرة بينهما.</p>
           </div>
         </div>
       </section>
 
       <section class="screen" data-screen="library">
         <div class="page-intro"><span class="eyebrow">MY COLLECTION</span><h1>مكتبة الأصوات</h1><p id="libraryStatus">تُحفظ محليًا في التجربة، وسحابيًا بعد ربط الحساب.</p></div>
-        <div class="info-card"><b>أصوات Fish Audio</b><p>لإضافة صوت جديد، افتح الاستوديو ثم ضع اسمه ورابطه من Fish Audio. يظهر الصوت فورًا في قائمة الاختيار. الملفات المحلية القديمة محفوظة، لكنها لا تعمل مع خادم Fish Audio الحالي.</p></div>
+        <div class="info-card"><b>أصوات Fish Audio</b><p>افتح الاستوديو لرفع ملف صوتي أو فيديو واستنساخ الصوت إلى مكتبتك الخاصة. يمكنك أيضًا إضافة أصوات سابقة بروابطها. تحفظ قائمة الأصوات على هذا الجهاز، بينما تُحفظ نماذج الاستنساخ في حساب Fish Audio.</p></div>
         <button class="btn primary full" data-nav="studio" type="button">＋ إضافة صوت Fish Audio من الاستوديو</button>
-        <button class="btn outline full" id="newVoiceBtn" type="button">إضافة ملف مرجعي محلي (للحفظ فقط)</button>
+        <button class="btn outline full" id="newVoiceBtn" type="button">🎙️ استنساخ صوت من فيديو أو ملف صوتي</button>
         <div class="section-title"><h2>الأصوات</h2><span id="libraryVoiceCount">0 صوت</span></div>
         <div id="voicesList" class="cards-stack"></div>
         <div class="section-title"><h2>المشاهد المحفوظة</h2><span id="libraryDraftCount">0 مشهد</span></div>
@@ -289,7 +317,8 @@ window.AVS_CONFIG = {
   const langLabel = { ja: 'يابانية', en: 'إنجليزية', ar: 'عربية' };
   const referenceTypes = { wav: 'audio/wav', mp3: 'audio/mpeg', m4a: 'audio/mp4', mp4: 'video/mp4', mov: 'video/quicktime', m4v: 'video/x-m4v' };
   let referenceUrl = null, referenceMedia = null, referenceDuration = 0, selectedFile = null;
-  let savedReferenceUrl = null, generatedUrl = null, generating = false;
+  let savedReferenceUrl = null, generatedUrls = [null, null], generating = false;
+  let clonePreviewUrl = null, cloneBusy = false;
   // Store reference files as blobs, not in localStorage JSON (works in iOS Safari/Chromium).
   function mediaTransaction(mode, key, value) {
     return new Promise((resolve, reject) => {
@@ -330,10 +359,15 @@ window.AVS_CONFIG = {
     return new File([item.blob], filename, { type: item.type || voice.config?.reference_mime || item.blob.type || 'application/octet-stream' });
   }
   function clearGeneratedAudio() {
-    $('generatedAudio').pause();
-    $('generatedAudio').removeAttribute('src');
-    if (generatedUrl) URL.revokeObjectURL(generatedUrl);
-    generatedUrl = null;
+    for (let i = 1; i <= 2; i++) {
+      const player = $('generatedAudio' + i);
+      player.pause();
+      player.removeAttribute('src');
+      player.load();
+      $('generatedBox' + i).hidden = true;
+      if (generatedUrls[i - 1]) URL.revokeObjectURL(generatedUrls[i - 1]);
+      generatedUrls[i - 1] = null;
+    }
     $('generationResult').hidden = true;
   }
   function apiBase() { return $('apiUrlInput').value.trim().replace(/\/+$/, ''); }
@@ -362,68 +396,211 @@ window.AVS_CONFIG = {
     } catch (err) { $('engineStatus').textContent = 'تعذر الوصول إلى المحرك: ' + (err.name === 'AbortError' ? 'انتهت مهلة الاتصال' : err.message); }
     finally { clearTimeout(id); $('checkEngineBtn').disabled = false; }
   }
+  async function parseApiError(response, prefix) {
+    let message = prefix + ' (HTTP ' + response.status + ')';
+    try {
+      const body = await response.json();
+      if (typeof body.detail === 'string') message = body.detail;
+    } catch (_) {}
+    return message;
+  }
+
   async function generateAudio() {
     if (generating) return;
     const text = $('scriptInput').value.trim();
     if (!text) return toast('اكتب النص الذي تريد أن تنطقه الشخصية');
-    if (text.length > 3000) return toast('الحد الأقصى للتوليد 3000 حرف');
+    if (text.length > 1200) return toast('الحد الحالي 1200 حرف لكل توليد');
     const url = apiBase();
     if (!validEndpoint(url)) { showScreen('account'); return toast('اربط خادم Fish Audio من صفحة الحساب أولًا'); }
-    if (!authToken()) { showScreen('account'); return toast('ضع مفتاح الخادم السري في صفحة الحساب'); }
+    if (!authToken()) { showScreen('account'); return toast('ضع مفتاح الخادم في صفحة الحساب'); }
     const fishVoice = selectedFishVoice();
-    if (!fishVoice) return toast('اختر صوت Fish Audio من القائمة أولًا');
-    const voice = null; // Local recordings are not supported by this Fish Worker.
-    const data = new FormData();
-    data.set('text', text);
-    data.set('reference_id', fishVoice.id);
-    data.set('language', state.language);
-    data.set('emotion', state.emotion);
-    data.set('intensity', $('intensity').value);
-    data.set('speed', (+$('speed').value / 100).toFixed(2));
-    data.set('volume', $('volume').value);
-    data.set('clip_start', '0'); data.set('clip_end', '0');
-    data.set('reference_language', voice?.language || '');
-    data.set('has_permission', 'false');
+    if (!fishVoice) return toast('اختر الصوت من قائمة Fish Audio أولًا');
     generating = true;
     $('generateBtn').disabled = true;
-    $('generateBtn').textContent = 'جارٍ التوليد...';
+    $('generateBtn').textContent = 'جارٍ توليد النسختين...';
     clearGeneratedAudio();
-    $('generationStatus').textContent = 'جارٍ توليد التسجيل بصوت «' + fishVoice.name + '» عبر Fish Audio...';
-    try {
-      if (voice?.kind === 'cloned') {
-        const file = await getReferenceFile(voice);
-        const clip = voice.config || {};
-        if (!(Number(clip.clip_end) - Number(clip.clip_start) >= 3)) throw new Error('مقطع هذا المرجع غير صالح؛ أعد إضافة الصوت');
-        data.set('reference', file, file.name);
-        data.set('clip_start', Number(clip.clip_start));
-        data.set('clip_end', Number(clip.clip_end));
-        data.set('has_permission', 'true'); // User confirmed rights when saving the reference.
-      }
-      // The optional description for original profiles is not a real voice prompt.
+    $('generationStatus').textContent = 'جارٍ توليد نسختين مستقلتين بصوت «' + fishVoice.name + '»...';
+    const createData = () => {
+      const data = new FormData();
+      data.set('text', text);
+      data.set('reference_id', fishVoice.id);
+      data.set('language', state.language);
+      data.set('emotion', state.emotion);
+      data.set('speed', (+$('speed').value / 100).toFixed(2));
+      return data;
+    };
+    const oneTake = async () => {
       const response = await fetch(url + '/generate', {
-        method: 'POST', headers: { Authorization: 'Bearer ' + authToken() }, body: data, cache: 'no-store'
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + authToken() },
+        body: createData(),
+        cache: 'no-store',
       });
-      if (!response.ok) {
-        let error = 'خطأ الخادم ' + response.status;
-        try { const detail = await response.json(); error = typeof detail.detail === 'string' ? detail.detail : error; } catch (_) {}
-        throw new Error(error);
-      }
+      if (!response.ok) throw new Error(await parseApiError(response, 'تعذر التوليد'));
       const audio = await response.blob();
-      if (!audio.size || !audio.type.includes('audio')) throw new Error('لم يُرجع الخادم صوتًا صالحًا');
-      generatedUrl = URL.createObjectURL(audio);
-      $('generatedAudio').src = generatedUrl;
-      $('downloadGenerated').href = generatedUrl;
-      $('downloadGenerated').download = 'anime-voice-' + new Date().toISOString().replace(/[:.]/g, '-') + '.wav';
-      $('generationResult').hidden = false;
-      $('generationStatus').textContent = 'تم توليد التسجيل بصوت «' + fishVoice.name + '» عبر Fish Audio.';
-      toast('الصوت جاهز للتشغيل أو الحفظ');
+      if (!audio.size || !audio.type.includes('audio')) throw new Error('الخادم لم يُرجع ملفًا صوتيًا صالحًا');
+      return audio;
+    };
+    try {
+      const results = await Promise.allSettled([oneTake(), oneTake()]);
+      let completed = 0;
+      const errors = [];
+      for (let idx = 0; idx < 2; idx++) {
+        const result = results[idx];
+        if (result.status === 'rejected') {
+          errors.push('النتيجة ' + (idx + 1) + ': ' + (result.reason?.message || 'فشلت'));
+          continue;
+        }
+        completed++;
+        const target = idx + 1;
+        const outputUrl = URL.createObjectURL(result.value);
+        generatedUrls[idx] = outputUrl;
+        $('generatedAudio' + target).src = outputUrl;
+        $('downloadGenerated' + target).href = outputUrl;
+        $('downloadGenerated' + target).download = 'anime-voice-' + target + '-' + Date.now() + '.wav';
+        $('generatedBox' + target).hidden = false;
+      }
+      $('generationResult').hidden = completed === 0;
+      if (completed === 2) {
+        $('generationStatus').textContent = 'اكتمل توليد نتيجتين بصوت «' + fishVoice.name + '». استمع وقارن بينهما.';
+        toast('تم توليد نتيجتين بنجاح');
+      } else if (completed === 1) {
+        $('generationStatus').textContent = 'تم توليد نتيجة واحدة. ' + errors.join(' / ');
+        toast('نجحت نتيجة واحدة من نتيجتين');
+      } else {
+        throw new Error(errors.join(' / '));
+      }
     } catch (err) {
       $('generationStatus').textContent = 'تعذر توليد الصوت: ' + (err.message || err);
       toast('فشل التوليد؛ راجع الرسالة الموجودة تحت الزر');
     } finally {
       generating = false;
       $('generateBtn').disabled = false;
-      $('generateBtn').textContent = '◉ توليد الصوت من النص';
+      $('generateBtn').textContent = '◉ توليد نسختين من الصوت';
+    }
+  }
+
+  // Extract a short mono WAV reference locally in the browser. Only WAV is uploaded.
+  function audioToWav(buffer) {
+    const samples = buffer.getChannelData(0);
+    const bytes = new ArrayBuffer(44 + samples.length * 2);
+    const view = new DataView(bytes);
+    const write = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); };
+    write(0, 'RIFF'); view.setUint32(4, bytes.byteLength - 8, true); write(8, 'WAVE');
+    write(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true); view.setUint32(24, buffer.sampleRate, true);
+    view.setUint32(28, buffer.sampleRate * 2, true); view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true); write(36, 'data'); view.setUint32(40, samples.length * 2, true);
+    for (let i = 0; i < samples.length; i++) {
+      const value = Math.max(-1, Math.min(1, samples[i]));
+      view.setInt16(44 + i * 2, value < 0 ? Math.round(value * 32768) : Math.round(value * 32767), true);
+    }
+    return new File([bytes], 'reference.wav', { type: 'audio/wav' });
+  }
+
+  function resetClonePreview() {
+    for (const id of ['cloneVideoPreview','cloneAudioPreview']) {
+      const player = $(id);
+      player.pause(); player.removeAttribute('src'); player.hidden = true; player.load();
+    }
+    if (clonePreviewUrl) URL.revokeObjectURL(clonePreviewUrl);
+    clonePreviewUrl = null;
+  }
+  function chooseCloneFile() {
+    resetClonePreview();
+    const file = $('cloneSourceFile').files[0];
+    if (!file) {
+      $('cloneFileInfo').textContent = 'لم يتم اختيار ملف بعد.';
+      return;
+    }
+    const extension = file.name.split('.').pop().toLowerCase();
+    if (!['wav', 'mp3', 'm4a', 'opus', 'mp4', 'mov', 'm4v'].includes(extension) || file.size > 30 * 1024 * 1024) {
+      $('cloneFileInfo').textContent = 'الصيغة غير مدعومة أو الملف أكبر من 30MB.';
+      return;
+    }
+    $('cloneFileInfo').textContent = file.name + ' — ' + (file.size / 1024 / 1024).toFixed(1) + ' MB';
+    clonePreviewUrl = URL.createObjectURL(file);
+    const media = ['mp4','mov','m4v'].includes(extension) ? $('cloneVideoPreview') : $('cloneAudioPreview');
+    media.src = clonePreviewUrl;
+    media.hidden = false;
+    media.load();
+  }
+
+  async function extractWavClip(file, startSeconds) {
+    // AudioContext decoders vary by browser and media codec. MP4/MOV with an
+    // unsupported audio track will raise a clear error rather than silently fail.
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    let decoded;
+    try {
+      decoded = await audioContext.decodeAudioData(await file.arrayBuffer());
+    } catch {
+      throw new Error('تعذر استخراج الصوت من هذا الملف في المتصفح. جرّب MP4 بصوت AAC أو صدّره كـ MP3/M4A/WAV.');
+    } finally {
+      await audioContext.close().catch(() => {});
+    }
+    const start = Math.max(0, Number(startSeconds) || 0);
+    const duration = Math.min(25, decoded.duration - start);
+    if (!Number.isFinite(duration) || duration < 10) throw new Error('اختر جزءًا يحتوي على 10 ثوانٍ على الأقل من صوت متحدث واحد.');
+    const rate = 24000;
+    const length = Math.ceil(duration * rate);
+    const offline = new OfflineAudioContext(1, length, rate);
+    const source = offline.createBufferSource();
+    source.buffer = decoded;
+    source.connect(offline.destination);
+    source.start(0, start, duration);
+    const rendered = await offline.startRendering();
+    return audioToWav(rendered);
+  }
+
+  async function createFishVoice() {
+    if (cloneBusy) return;
+    const name = $('cloneVoiceName').value.trim();
+    const file = $('cloneSourceFile').files[0];
+    if (!name || !file) return toast('اكتب اسم الصوت واختر ملفًا صوتيًا أو فيديو');
+    if (file.size > 30 * 1024 * 1024) return toast('الحد الأقصى لحجم الملف 30MB');
+    if (!$('cloneConsent').checked) return toast('أكد أنك تملك إذن استخدام الصوت');
+    if (!validEndpoint(apiBase()) || !authToken()) { showScreen('account'); return toast('اربط خادم Fish Audio أولًا من صفحة الحساب'); }
+    cloneBusy = true;
+    $('createFishVoiceBtn').disabled = true;
+    $('createFishVoiceBtn').textContent = 'جارٍ تجهيز التسجيل...';
+    const status = $('cloneStatus');
+    try {
+      status.textContent = 'جارٍ استخراج عينة صوتية من الملف على جهازك...';
+      const wav = await extractWavClip(file, $('cloneStart').value);
+      const data = new FormData();
+      data.set('title', name);
+      data.set('has_permission', 'true');
+      data.set('voices', wav, 'reference.wav');
+      status.textContent = 'جارٍ إرسال عينة WAV وإنشاء الصوت في Fish Audio...';
+      $('createFishVoiceBtn').textContent = 'جارٍ استنساخ الصوت...';
+      const response = await fetch(apiBase() + '/voices/create', {
+        method: 'POST', headers: { Authorization: 'Bearer ' + authToken() },
+        body: data, cache: 'no-store',
+      });
+      if (!response.ok) throw new Error(await parseApiError(response, 'فشل استنساخ الصوت'));
+      const result = await response.json();
+      if (!fishVoiceIdPattern.test(result.id || '')) throw new Error('لم يرجع معرّف صوت صالح');
+      const existing = fishVoices.find(v => v.id === result.id);
+      if (existing) existing.name = name;
+      else fishVoices.push({ id: result.id, name });
+      persistFishVoices();
+      renderLibrary();
+      $('voiceSelect').value = 'fish:' + result.id;
+      localStorage.setItem(fishSelectedKey, result.id);
+      $('cloneVoiceName').value = '';
+      $('cloneSourceFile').value = '';
+      $('cloneConsent').checked = false;
+      resetClonePreview();
+      $('cloneFileInfo').textContent = 'لم يتم اختيار ملف بعد.';
+      status.textContent = '✓ حُفظ الصوت «' + name + '» في قائمتك. حالة Fish Audio: ' + (result.state || 'created') + (result.state === 'trained' ? ' — جاهز للتوليد.' : ' — قد يحتاج إلى وقت قصير قبل أول توليد.');
+      toast('حُفظ الصوت الجديد ويمكن اختياره الآن');
+    } catch (err) {
+      status.textContent = 'تعذر إنشاء الصوت: ' + (err.message || err);
+      toast('تعذر استنساخ الصوت؛ راجع الرسالة تحت زر الرفع');
+    } finally {
+      cloneBusy = false;
+      $('createFishVoiceBtn').disabled = false;
+      $('createFishVoiceBtn').textContent = '◉ استنساخ الصوت وحفظه';
     }
   }
 
@@ -562,7 +739,7 @@ window.AVS_CONFIG = {
   for (const [id, output, unit] of [['intensity','intensityOut','%'],['volume','volumeOut','%'],['speed','speedOut','×']]) {
     $(id).addEventListener('input', () => { $(output).textContent = (id === 'speed' ? (Number($(id).value) / 100).toFixed(2) : $(id).value) + unit; });
   }
-  $('scriptInput').addEventListener('input', () => $('charCount').textContent = $('scriptInput').value.length + ' / 3000');
+  $('scriptInput').addEventListener('input', () => $('charCount').textContent = $('scriptInput').value.length + ' / 1200');
   $('saveDraftBtn').addEventListener('click', async () => {
     if (!checkAuth()) return;
     const script = $('scriptInput').value.trim();
@@ -653,7 +830,11 @@ window.AVS_CONFIG = {
     referenceMedia.src = referenceUrl;
     referenceMedia.load();
   }
-  $('newVoiceBtn').addEventListener('click', () => { if (!checkAuth()) return; releaseReference(); $('voiceForm').reset(); $('audioUploadGroup').hidden = true; $('voiceSaveNote').textContent = 'التصميم الأصلي يستخدم صوت النموذج الافتراضي؛ لا يصنع الوصف صوتًا خاصًا تلقائيًا.'; $('voiceDialog').showModal(); });
+  $('newVoiceBtn').addEventListener('click', () => {
+    showScreen('studio');
+    $('cloneVoiceName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    $('cloneVoiceName').focus({ preventScroll: true });
+  });
   $('newVoiceFile').addEventListener('change', updateReferenceFile);
   $('referenceVideo').addEventListener('loadedmetadata', setupReferenceDuration);
   $('referenceAudio').addEventListener('loadedmetadata', setupReferenceDuration);
@@ -811,6 +992,8 @@ window.AVS_CONFIG = {
     $('apiTokenInput').value = sessionStorage.getItem(apiTokenKey) || '';
     $('checkEngineBtn').addEventListener('click', checkEngine);
     $('generateBtn').addEventListener('click', generateAudio);
+    $('cloneSourceFile').addEventListener('change', chooseCloneFile);
+    $('createFishVoiceBtn').addEventListener('click', createFishVoice);
     $('addFishVoiceBtn').addEventListener('click', addFishVoice);
     $('removeFishVoiceBtn').addEventListener('click', removeFishVoice);
     $('voiceSelect').addEventListener('change', () => {
