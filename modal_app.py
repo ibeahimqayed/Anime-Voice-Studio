@@ -20,8 +20,8 @@ image = (
         "uvicorn[standard]>=0.34,<1",
         "python-multipart>=0.0.20,<1",
     )
-    .add_local_file("backend.py", "/root/avs_backend.py")
     .env({"AVS_CORS_ORIGINS": "https://ibeahimqayed.github.io"})
+    .add_local_file("backend.py", "/root/avs_backend.py")
 )
 
 
