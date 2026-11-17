@@ -40,7 +40,7 @@
   <div class="app-shell">
     <header class="topbar">
       <div class="brand-logo" aria-hidden="true"><span>AV</span><i></i></div>
-      <div class="brand-text"><b>ANIME VOICE</b><small>STUDIO · iPhone v0.4</small></div>
+      <div class="brand-text"><b>ANIME VOICE</b><small>STUDIO · iPhone v0.6</small></div>
       <div id="cloudIndicator" class="status-pill">وضع التجربة</div>
     </header>
 
@@ -64,7 +64,7 @@
           <button class="feature" data-nav="studio"><span class="feature-icon cyan">◈</span><span><b>Anime Director</b><small>تحدٍ، هيبة، غضب، سخرية والمزيد</small></span><span class="chevron">‹</span></button>
           <button class="feature" data-nav="account"><span class="feature-icon amber">◎</span><span><b>Cloud Account</b><small>اربط حسابك للمزامنة بين الأجهزة</small></span><span class="chevron">‹</span></button>
         </div>
-        <p class="small-hint">التوليد متاح بعد ربط خادم Chatterbox الخاص بك. الملفات المرجعية محفوظة محليًا في وضع التجربة أو سحابيًا عند إعداد حساب.</p>
+        <p class="small-hint">التوليد عبر Fish Audio بعد ربط خادم Cloudflare. يمكنك اختيار أصوات Fish متعددة من الاستوديو، وإضافة المزيد بروابطها.</p>
       </section>
 
       <section class="screen" data-screen="studio">
@@ -77,8 +77,18 @@
           <label class="field-label" for="scriptInput">النص</label>
           <textarea id="scriptInput" placeholder="اكتب حوار الشخصية هنا..." rows="5" maxlength="3000" spellcheck="false"></textarea>
           <div class="field-meta"><span id="charCount">0 / 3000</span><span id="languageTip">Japanese script</span></div>
-          <label class="field-label" for="voiceSelect">الشخصية الصوتية</label>
-          <select id="voiceSelect"><option value="">بدون صوت محدد</option></select>
+          <label class="field-label" for="voiceSelect">اختر الصوت — Fish Audio</label>
+          <select id="voiceSelect"><option value="">جاري تحميل الأصوات...</option></select>
+          <p class="inline-note">الصوت المحدد يُستخدم في التوليد. تُحفظ قائمة أصوات Fish محليًا على هذا الجهاز.</p>
+          <div class="form-card" style="margin-top:10px;padding:12px">
+            <b>＋ إضافة صوت محفوظ من Fish Audio</b>
+            <label class="field-label" for="fishVoiceName">اسم الصوت</label>
+            <input id="fishVoiceName" type="text" maxlength="60" placeholder="مثال: صوت جديد" />
+            <label class="field-label" for="fishVoiceLink">رابط الصوت أو المعرّف</label>
+            <input id="fishVoiceLink" type="text" dir="ltr" spellcheck="false" placeholder="https://fish.audio/m/..." />
+            <button type="button" id="addFishVoiceBtn" class="btn outline full">＋ حفظ الصوت في قائمتي</button>
+            <button type="button" id="removeFishVoiceBtn" class="link-button">حذف الصوت المحدد من قائمة Fish</button>
+          </div>
           <div class="field-head"><label class="field-label">أسلوب الأداء</label><small>لا يحدد مستوى الصراخ</small></div>
           <div class="emotion-chips" id="emotionGroup" role="group" aria-label="المشاعر">
             <button data-emotion="Challenge" class="chosen">⚔️ تحدي</button>
@@ -107,8 +117,9 @@
 
       <section class="screen" data-screen="library">
         <div class="page-intro"><span class="eyebrow">MY COLLECTION</span><h1>مكتبة الأصوات</h1><p id="libraryStatus">تُحفظ محليًا في التجربة، وسحابيًا بعد ربط الحساب.</p></div>
-        <div class="info-card"><b>توليد من عينة فيديو أو صوت</b><p>اضغط «إضافة صوت جديد» ثم «استنساخ»، وارفع MP4 أو MOV أو ملفًا صوتيًا وحدد مقطع الكلام. بعد حفظه اختره داخل الاستوديو واكتب النص، ثم اضغط «توليد الصوت». <strong>يجب توصيل خادم الذكاء الاصطناعي أولًا.</strong></p></div>
-        <button class="btn primary full" id="newVoiceBtn">＋ إضافة صوت جديد</button>
+        <div class="info-card"><b>أصوات Fish Audio</b><p>لإضافة صوت جديد، افتح الاستوديو ثم ضع اسمه ورابطه من Fish Audio. يظهر الصوت فورًا في قائمة الاختيار. الملفات المحلية القديمة محفوظة، لكنها لا تعمل مع خادم Fish Audio الحالي.</p></div>
+        <button class="btn primary full" data-nav="studio" type="button">＋ إضافة صوت Fish Audio من الاستوديو</button>
+        <button class="btn outline full" id="newVoiceBtn" type="button">إضافة ملف مرجعي محلي (للحفظ فقط)</button>
         <div class="section-title"><h2>الأصوات</h2><span id="libraryVoiceCount">0 صوت</span></div>
         <div id="voicesList" class="cards-stack"></div>
         <div class="section-title"><h2>المشاهد المحفوظة</h2><span id="libraryDraftCount">0 مشهد</span></div>
@@ -131,11 +142,11 @@
         </div>
         <div class="form-card engine-panel">
           <h2>محرك توليد الصوت</h2>
-          <p class="inline-note">لتفعيل التوليد أدخل عنوان خادم Chatterbox الآمن (HTTPS) الذي شغّلته بنفسك. GitHub Pages يستضيف الواجهة فقط، ولا يعمل الخادم تلقائيًا.</p>
+          <p class="inline-note">لتفعيل التوليد أدخل عنوان Cloudflare Worker الخاص بمحرك Fish Audio (HTTPS). مفتاح Fish Audio محفوظ داخل Cloudflare ولا يُكتب في التطبيق.</p>
           <label class="field-label" for="apiUrlInput">عنوان الخادم (HTTPS)</label>
           <input id="apiUrlInput" type="url" dir="ltr" spellcheck="false" placeholder="https://your-server.example.com" autocomplete="url" />
           <label class="field-label" for="apiTokenInput">مفتاح الخادم السري</label>
-          <input id="apiTokenInput" type="password" dir="ltr" spellcheck="false" placeholder="AVS_API_TOKEN" autocomplete="off" />
+          <input id="apiTokenInput" type="password" dir="ltr" spellcheck="false" placeholder="AVS_ACCESS_TOKEN" autocomplete="off" />
           <button type="button" id="checkEngineBtn" class="btn outline full">فحص الاتصال وحفظ الإعدادات</button>
           <p id="engineStatus" class="inline-note" role="status" aria-live="polite">لم يتم ربط المحرك بعد.</p>
           <p class="inline-note">العنوان يُحفظ في هذا المتصفح. المفتاح يبقى في جلسة المتصفح فقط ولا يُرفع إلى GitHub ضمن ملفات التطبيق. لا تضع المفتاح في config.js.</p>
@@ -216,6 +227,55 @@ window.AVS_CONFIG = {
   const localKey = 'anime_voice_studio_iphone_v02'; // Keep earlier voice profiles and drafts.
   const apiUrlKey = 'anime_voice_studio_api_url_v04';
   const apiTokenKey = 'anime_voice_studio_api_token_session';
+  const fishVoiceKey = 'anime_voice_studio_fish_voices_v1';
+  const fishSelectedKey = 'anime_voice_studio_selected_fish_v1';
+  const defaultFishVoices = [
+    { id: '539134ff5139467c9f29cd898844fe3a', name: 'نانامي' },
+    { id: '26851091ff394641a007b42e6cc6c490', name: 'الصوت الجديد' },
+  ];
+  const fishVoiceIdPattern = /^[a-f0-9]{32}$/i;
+  function loadFishVoices() {
+    try {
+      const data = JSON.parse(localStorage.getItem(fishVoiceKey) || 'null');
+      if (!Array.isArray(data)) return defaultFishVoices.map(v => ({...v}));
+      const seen = new Set();
+      return data.filter(v => v && typeof v.id === 'string' && fishVoiceIdPattern.test(v.id) && typeof v.name === 'string' && v.name.trim() && !seen.has(v.id.toLowerCase()) && seen.add(v.id.toLowerCase())).slice(0, 100).map(v => ({ id: v.id.toLowerCase(), name: v.name.trim().slice(0, 60) }));
+    } catch { return defaultFishVoices.map(v => ({...v})); }
+  }
+  let fishVoices = loadFishVoices();
+  function persistFishVoices() { localStorage.setItem(fishVoiceKey, JSON.stringify(fishVoices)); }
+  function selectedFishVoice() {
+    const value = $('voiceSelect').value;
+    if (!value.startsWith('fish:')) return null;
+    return fishVoices.find(v => 'fish:' + v.id === value) || null;
+  }
+  function addFishVoice() {
+    const name = $('fishVoiceName').value.trim();
+    const raw = $('fishVoiceLink').value.trim();
+    const match = raw.match(/^(?:https?:\/\/)?(?:www\.)?fish\.audio\/m\/([a-f0-9]{32})(?:[/?#].*)?$/i) || raw.match(/^([a-f0-9]{32})$/i);
+    if (!name || !match) return toast('أدخل اسم الصوت ورابط Fish Audio الصحيح');
+    const id = match[1].toLowerCase();
+    const existing = fishVoices.find(v => v.id === id);
+    if (existing) existing.name = name.slice(0, 60);
+    else fishVoices.push({ name: name.slice(0, 60), id });
+    persistFishVoices();
+    renderLibrary();
+    $('voiceSelect').value = 'fish:' + id;
+    localStorage.setItem(fishSelectedKey, id);
+    $('fishVoiceName').value = '';
+    $('fishVoiceLink').value = '';
+    toast(existing ? 'تم تحديث اسم الصوت واختياره' : 'تمت إضافة الصوت واختياره');
+  }
+  function removeFishVoice() {
+    const voice = selectedFishVoice();
+    if (!voice) return toast('اختر صوت Fish أولًا');
+    if (!confirm('حذف «' + voice.name + '» من قائمة الأصوات في هذا الجهاز؟')) return;
+    fishVoices = fishVoices.filter(v => v.id !== voice.id);
+    persistFishVoices();
+    localStorage.removeItem(fishSelectedKey);
+    renderLibrary();
+    toast('حُذف الصوت من قائمة التطبيق، ولم يُحذف من Fish Audio');
+  }
   const defaults = { voices: [], drafts: [] };
   const loadLocal = () => {
     try {
@@ -297,7 +357,7 @@ window.AVS_CONFIG = {
       if (!result.ok) throw new Error('استجابة الخادم: ' + result.status);
       const status = await result.json();
       if (status.status !== 'ok' || !status.configured) throw new Error('الخادم يعمل، لكن مفتاح AVS_API_TOKEN غير مُعد');
-      $('engineStatus').textContent = '✓ الخادم متصل — ' + (status.checkpoint || 'Chatterbox') + (status.model_loaded ? ' · النموذج محمّل' : ' · النموذج يُحمّل عند أول توليد');
+      $('engineStatus').textContent = '✓ الخادم متصل — ' + (status.checkpoint || 'Fish Audio') + '';
       $('generationStatus').textContent = 'الخادم متصل. يمكنك كتابة النص واختيار الصوت والضغط على توليد.';
     } catch (err) { $('engineStatus').textContent = 'تعذر الوصول إلى المحرك: ' + (err.name === 'AbortError' ? 'انتهت مهلة الاتصال' : err.message); }
     finally { clearTimeout(id); $('checkEngineBtn').disabled = false; }
@@ -308,11 +368,14 @@ window.AVS_CONFIG = {
     if (!text) return toast('اكتب النص الذي تريد أن تنطقه الشخصية');
     if (text.length > 3000) return toast('الحد الأقصى للتوليد 3000 حرف');
     const url = apiBase();
-    if (!validEndpoint(url)) { showScreen('account'); return toast('اربط خادم Chatterbox من صفحة الحساب أولًا'); }
+    if (!validEndpoint(url)) { showScreen('account'); return toast('اربط خادم Fish Audio من صفحة الحساب أولًا'); }
     if (!authToken()) { showScreen('account'); return toast('ضع مفتاح الخادم السري في صفحة الحساب'); }
-    const voice = state.voices.find(v => v.id === $('voiceSelect').value);
+    const fishVoice = selectedFishVoice();
+    if (!fishVoice) return toast('اختر صوت Fish Audio من القائمة أولًا');
+    const voice = null; // Local recordings are not supported by this Fish Worker.
     const data = new FormData();
     data.set('text', text);
+    data.set('reference_id', fishVoice.id);
     data.set('language', state.language);
     data.set('emotion', state.emotion);
     data.set('intensity', $('intensity').value);
@@ -325,7 +388,7 @@ window.AVS_CONFIG = {
     $('generateBtn').disabled = true;
     $('generateBtn').textContent = 'جارٍ التوليد...';
     clearGeneratedAudio();
-    $('generationStatus').textContent = 'جارٍ تجهيز الصوت وتوليد التسجيل. أول تشغيل للنموذج قد يستغرق وقتًا إضافيًا.';
+    $('generationStatus').textContent = 'جارٍ توليد التسجيل بصوت «' + fishVoice.name + '» عبر Fish Audio...';
     try {
       if (voice?.kind === 'cloned') {
         const file = await getReferenceFile(voice);
@@ -352,7 +415,7 @@ window.AVS_CONFIG = {
       $('downloadGenerated').href = generatedUrl;
       $('downloadGenerated').download = 'anime-voice-' + new Date().toISOString().replace(/[:.]/g, '-') + '.wav';
       $('generationResult').hidden = false;
-      $('generationStatus').textContent = voice?.kind === 'cloned' ? 'تم توليد التسجيل من عينة الصوت المحددة.' : 'تم التوليد بصوت Chatterbox الافتراضي، وليس بصوت مُصمّم من الوصف.';
+      $('generationStatus').textContent = 'تم توليد التسجيل بصوت «' + fishVoice.name + '» عبر Fish Audio.';
       toast('الصوت جاهز للتشغيل أو الحفظ');
     } catch (err) {
       $('generationStatus').textContent = 'تعذر توليد الصوت: ' + (err.message || err);
@@ -402,18 +465,27 @@ window.AVS_CONFIG = {
     const button = document.createElement('button'); button.className = 'icon-button'; button.type = 'button'; button.textContent = text; button.setAttribute('aria-label', aria); button.addEventListener('click', onClick); return button;
   }
   function renderLibrary() {
-    $('voiceCount').textContent = state.voices.length;
+    $('voiceCount').textContent = state.voices.length + fishVoices.length;
     $('draftCount').textContent = state.drafts.length;
-    $('libraryVoiceCount').textContent = state.voices.length + ' صوت';
+    $('libraryVoiceCount').textContent = (state.voices.length + fishVoices.length) + ' صوت';
     $('libraryDraftCount').textContent = state.drafts.length + ' مشهد';
     const voicesList = $('voicesList'); voicesList.replaceChildren();
     const draftsList = $('draftsList'); draftsList.replaceChildren();
     const voiceSelect = $('voiceSelect');
     const selected = voiceSelect.value;
-    voiceSelect.replaceChildren(new Option('بدون صوت محدد', ''));
+    voiceSelect.replaceChildren(new Option('اختر صوت Fish Audio', ''));
+    for (const fv of fishVoices) {
+      voiceSelect.add(new Option('🎙️ ' + fv.name, 'fish:' + fv.id));
+      const fishCard = addText(voicesList, 'div', '', 'collection-card');
+      addText(fishCard, 'div', '🎙️', 'collection-icon');
+      const fb = addText(fishCard, 'div', '', 'collection-body');
+      addText(fb, 'b', fv.name);
+      addText(fb, 'p', 'صوت محفوظ في Fish Audio');
+      const actions = addText(fishCard, 'div', '', 'card-actions');
+      actions.appendChild(actionButton('↗', 'اختيار الصوت في الاستوديو', () => { showScreen('studio'); $('voiceSelect').value = 'fish:' + fv.id; localStorage.setItem(fishSelectedKey, fv.id); toast('تم اختيار «' + fv.name + '»'); }));
+      actions.appendChild(actionButton('✕', 'حذف من التطبيق فقط', () => { $('voiceSelect').value = 'fish:' + fv.id; removeFishVoice(); }));
+    }
     for (const voice of state.voices) {
-      const option = new Option(voice.title, voice.id);
-      voiceSelect.add(option);
       const card = addText(voicesList, 'div', '', 'collection-card');
       addText(card, 'div', voice.kind === 'cloned' ? '◉' : '✧', 'collection-icon');
       const body = addText(card, 'div', '', 'collection-body');
@@ -424,11 +496,12 @@ window.AVS_CONFIG = {
       addText(tags, 'span', voice.kind === 'cloned' ? 'مرجع صوتي' : 'تصميم أصلي');
       const actions = addText(card, 'div', '', 'card-actions');
       if (voice.kind === 'cloned') actions.appendChild(actionButton('▶', 'تشغيل التسجيل المرجعي', () => playReference(voice)));
-      actions.appendChild(actionButton('↗', 'استخدام الصوت في المحرر', () => { showScreen('studio'); $('voiceSelect').value = voice.id; toast('تم اختيار الصوت؛ اكتب النص واضغط «توليد الصوت»'); }));
+      actions.appendChild(actionButton('↗', 'عرض تنبيه دعم الملفات المحلية', () => { showScreen('studio'); toast('ملفات الصوت المحلية القديمة غير مدعومة في خادم Fish الحالي؛ اختر صوت Fish من القائمة'); }));
       actions.appendChild(actionButton('✕', 'حذف الصوت', () => removeVoice(voice)));
     }
-    if (!state.voices.length) voicesList.appendChild(emptyNode('ما عندك أصوات بعد. اضغط «إضافة صوت جديد» لإنشاء ملف تعريف أو حفظ تسجيل مرجعي.'));
-    voiceSelect.value = [...voiceSelect.options].some(opt => opt.value === selected) ? selected : '';
+    if (!state.voices.length && !fishVoices.length) voicesList.appendChild(emptyNode('لم تضف أي صوت بعد. أضف رابط Fish Audio من الاستوديو.'));
+    const preferred = selected.startsWith('fish:') ? selected : ('fish:' + (localStorage.getItem(fishSelectedKey) || '539134ff5139467c9f29cd898844fe3a'));
+    voiceSelect.value = [...voiceSelect.options].some(opt => opt.value === preferred) ? preferred : (fishVoices.length ? 'fish:' + fishVoices[0].id : '');
     for (const draft of state.drafts) {
       const card = addText(draftsList, 'div', '', 'collection-card');
       addText(card, 'div', '✎', 'collection-icon');
@@ -738,6 +811,12 @@ window.AVS_CONFIG = {
     $('apiTokenInput').value = sessionStorage.getItem(apiTokenKey) || '';
     $('checkEngineBtn').addEventListener('click', checkEngine);
     $('generateBtn').addEventListener('click', generateAudio);
+    $('addFishVoiceBtn').addEventListener('click', addFishVoice);
+    $('removeFishVoiceBtn').addEventListener('click', removeFishVoice);
+    $('voiceSelect').addEventListener('change', () => {
+      const fv = selectedFishVoice();
+      if (fv) localStorage.setItem(fishSelectedKey, fv.id);
+    });
     renderAccount(); renderLibrary();
     if (cloudAvailable) {
       const {data,error} = await client.auth.getSession();
