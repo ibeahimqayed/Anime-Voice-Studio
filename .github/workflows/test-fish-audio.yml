@@ -1,0 +1,81 @@
+name: Test Fish Audio (S2.1 Free)
+
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: 'Japanese text to speak'
+        required: true
+        default: 'ここからが本番です。覚悟してください。'
+        type: string
+      reference_id:
+        description: 'Optional Fish Audio voice/model ID. Leave blank for default voice.'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  test-fish-audio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Generate speech securely using Fish Audio
+        env:
+          FISH_AUDIO_API_KEY: ${{ secrets.FISH_AUDIO_API_KEY }}
+          VOICE_TEXT: ${{ inputs.text }}
+          REFERENCE_ID: ${{ inputs.reference_id }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+          import urllib.error
+          import urllib.request
+
+          key = os.environ.get('FISH_AUDIO_API_KEY', '').strip()
+          if not key:
+              sys.exit('Secret FISH_AUDIO_API_KEY was not found in repository Actions secrets.')
+
+          payload = {
+              'text': os.environ.get('VOICE_TEXT', 'こんにちは。'),
+              'format': 'mp3',
+          }
+          reference_id = os.environ.get('REFERENCE_ID', '').strip()
+          if reference_id:
+              payload['reference_id'] = reference_id
+
+          request = urllib.request.Request(
+              url='https://api.fish.audio/v1/tts',
+              data=json.dumps(payload, ensure_ascii=False).encode('utf-8'),
+              headers={
+                  'Authorization': 'Bearer ' + key,
+                  'Content-Type': 'application/json',
+                  'model': 's2.1-pro-free',
+              },
+              method='POST',
+          )
+          try:
+              with urllib.request.urlopen(request, timeout=180) as response:
+                  data = response.read(25 * 1024 * 1024)
+                  media_type = response.headers.get('Content-Type', '')
+          except urllib.error.HTTPError as error:
+              details = error.read(600).decode('utf-8', errors='replace')
+              sys.exit('Fish Audio API returned HTTP {}: {}'.format(error.code, details))
+          except Exception as error:
+              sys.exit('Request failed: {}'.format(type(error).__name__))
+
+          if not data or ('json' in media_type.lower()):
+              sys.exit('No audio received. Response media type: {}'.format(media_type))
+          with open('fish-voice-test.mp3', 'wb') as file:
+              file.write(data)
+          print('Saved generated audio ({} bytes).'.format(len(data)))
+          PY
+
+      - name: Downloadable audio result
+        uses: actions/upload-artifact@v4
+        with:
+          name: fish-audio-result
+          path: fish-voice-test.mp3
+          if-no-files-found: error
