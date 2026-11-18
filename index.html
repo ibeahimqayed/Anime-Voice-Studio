@@ -119,10 +119,19 @@
           </div>
           <label class="field-label" for="performanceDirection">توجيه الأداء المسرحي — اختياري (Drama 3)</label>
           <textarea id="performanceDirection" rows="3" maxlength="320" spellcheck="false" placeholder="مثال: بصوت عميق، ملكي ومهيب، ببطء محسوب، مع وقفات درامية قصيرة ودون صراخ"></textarea>
-          <p class="inline-note">إذا كتبت توجيهًا هنا، سيتقدم على النمط الجاهز. ويمكنك أيضًا وضع توجيهات مثل [cold, restrained anger] داخل النص نفسه. النتيجة تعتمد على الصوت والنموذج، ولا يمكن ضمان أداء محدد.</p>
-          <div class="range-block"><div><label for="intensity">شدة التوجيه التمثيلي (تقريبية)</label><output id="intensityOut">70%</output></div><input type="range" id="intensity" min="0" max="100" value="70" /></div>
-          <div class="range-block"><div><label for="volume">قوة الصوت (ليست المشاعر)</label><output id="volumeOut">40%</output></div><input type="range" id="volume" min="0" max="100" value="40" /></div>
-          <div class="range-block"><div><label for="speed">سرعة النطق</label><output id="speedOut">1.0×</output></div><input type="range" id="speed" min="60" max="140" value="100" step="5" /></div>
+          <p class="inline-note">التوجيه الذي تكتبه يكمل الشعور المختار. يمكنك أيضًا استخدام وسوم داخل النص مثل [cold, restrained anger].</p>
+          <label class="inline-note" style="display:flex;align-items:flex-start;gap:9px"><input type="checkbox" id="overridePerformancePreset" style="margin-top:4px;flex:none" /> <span>استخدم توجيهي اليدوي فقط، دون وصف الشعور الجاهز (اختياري).</span></label>
+          <div class="range-block"><div><label for="intensity">قوة التعبير التمثيلي (توجيه تقريبي)</label><output id="intensityOut">70%</output></div><input type="range" id="intensity" min="0" max="100" value="70" step="5" /></div>
+          <p class="inline-note">كلما رفعت القوة، يصبح وصف الأداء أشد تعبيرًا؛ النسبة ليست قيمة فعلية داخل نموذج Fish Audio.</p>
+          <div class="range-block"><div><label for="volume">مستوى الصوت الحقيقي (dB) — لا يغير الشعور</label><output id="volumeOut">0 dB</output></div><input type="range" id="volume" min="-6" max="6" value="0" step="1" /></div>
+          <div class="range-block"><div><label for="speed">سرعة النطق (يفضل 1.00×)</label><output id="speedOut">1.00×</output></div><input type="range" id="speed" min="90" max="110" value="100" step="5" /></div>
+          <p class="inline-note">للإلقاء البطيء أو الوقفات الثقيلة، صف ذلك في التوجيه بدل خفض سرعة التوليد كثيرًا لتجنب الطابع الآلي.</p>
+          <div class="form-card" style="padding:12px;margin:10px 0" aria-live="polite">
+            <b>🎭 نسختان لنفس الشعور ونفس الشخصية</b>
+            <p class="inline-note" id="takeAExplanation">النتيجة الأولى: تحدٍ واثق ومسيطر عليه.</p>
+            <p class="inline-note" id="takeBExplanation">النتيجة الثانية: تحدٍ أكثر استفزازًا وتهديدًا.</p>
+            <p class="inline-note">كل نسخة لها توجيه تمثيلي ودرجة تنوع مختلفة؛ لا نغيّر الشخصية أو النص.</p>
+          </div>
           <label class="field-label" for="draftName">اسم المشهد للحفظ</label>
           <input id="draftName" maxlength="80" placeholder="مثل: إعلان التحدي" />
           <button class="btn primary full" id="saveDraftBtn">حفظ المشهد في المكتبة</button>
@@ -132,23 +141,32 @@
           <div id="generationResult" class="generation-result" hidden>
             <b>اختر النتيجة التي تفضلها</b>
             <div id="generatedBox1" class="form-card" style="margin:10px 0;padding:12px" hidden>
-              <b>🎧 النتيجة الأولى</b>
+              <b>🎧 النتيجة الأولى — أداء متزن</b>
+              <p class="inline-note" id="takeACaption"></p>
               <audio id="generatedAudio1" controls preload="none" style="width:100%;margin:9px 0"></audio>
               <a class="btn outline full download-btn" id="downloadGenerated1" download="anime-voice-1.wav">↓ حفظ النتيجة الأولى WAV</a>
             </div>
             <div id="generatedBox2" class="form-card" style="margin:10px 0;padding:12px" hidden>
-              <b>🎧 النتيجة الثانية</b>
+              <b>🎧 النتيجة الثانية — أداء أكثر درامية</b>
+              <p class="inline-note" id="takeBCaption"></p>
               <audio id="generatedAudio2" controls preload="none" style="width:100%;margin:9px 0"></audio>
               <a class="btn outline full download-btn" id="downloadGenerated2" download="anime-voice-2.wav">↓ حفظ النتيجة الثانية WAV</a>
             </div>
-            <p class="inline-note">كل نتيجة مولدة بشكل مستقل، وقد تختلف النبرة بينهما.</p>
+            <p class="inline-note">النسختان تحتفظان بالصوت والنص نفسيهما وتختلفان في توجيه الأداء ودرجة التنوع. قد يختلف الالتزام بالتوجيه حسب النموذج.</p>
           </div>
         </div>
       </section>
 
       <section class="screen" data-screen="library">
         <div class="page-intro"><span class="eyebrow">MY COLLECTION</span><h1>مكتبة الأصوات</h1><p id="libraryStatus">تُحفظ محليًا في التجربة، وسحابيًا بعد ربط الحساب.</p></div>
-        <div class="info-card"><b>أصوات Fish Audio</b><p>افتح الاستوديو لرفع ملف صوتي أو فيديو واستنساخ الصوت إلى مكتبتك الخاصة. يمكنك أيضًا إضافة أصوات سابقة بروابطها. تحفظ قائمة الأصوات على هذا الجهاز، بينما تُحفظ نماذج الاستنساخ في حساب Fish Audio.</p></div>
+        <div class="info-card"><b>أصوات Fish Audio</b><p>تمت استعادة المعرّفات المعروفة التي أرسلتها سابقًا دون حذف أصواتك المحفوظة أو تغيير أسمائها. تظهر في الاستوديو للاختيار والتوليد. القائمة محفوظة في هذا المتصفح وليست مزامنة سحابية تلقائية.</p></div>
+        <div class="form-card" style="margin:12px 0;padding:13px">
+          <b>↔ نقل قائمة الأصوات بين الكمبيوتر والجوال</b>
+          <p class="inline-note">من الجهاز الذي تظهر عليه جميع أصواتك، نزّل ملف القائمة ثم افتح التطبيق على الجهاز الثاني واستورده. تنقل العملية أسماء الأصوات ومعرّفاتها، ولا تنقل الملفات الصوتية أو مفاتيح API.</p>
+          <button type="button" id="exportFishVoicesBtn" class="btn outline full">↓ تنزيل نسخة من قائمة الأصوات</button>
+          <label class="field-label" for="importFishVoicesFile">استيراد قائمة الأصوات من جهاز آخر (JSON)</label>
+          <input id="importFishVoicesFile" type="file" accept=".json,application/json" />
+        </div>
         <button class="btn primary full" data-nav="studio" type="button">＋ إضافة صوت Fish Audio من الاستوديو</button>
         <button class="btn outline full" id="newVoiceBtn" type="button">🎙️ استنساخ صوت من فيديو أو ملف صوتي</button>
         <div class="section-title"><h2>الأصوات</h2><span id="libraryVoiceCount">0 صوت</span></div>
@@ -260,21 +278,86 @@ window.AVS_CONFIG = {
   const apiTokenKey = 'anime_voice_studio_api_token_session';
   const fishVoiceKey = 'anime_voice_studio_fish_voices_v1';
   const fishSelectedKey = 'anime_voice_studio_selected_fish_v1';
+  // Known Fish Audio voice IDs supplied by the owner; merge only once without changing custom names.
+  // Unconfirmed names are deliberately labelled by their ID prefix, rather than guessing an identity.
   const defaultFishVoices = [
     { id: '539134ff5139467c9f29cd898844fe3a', name: 'نانامي' },
-    { id: '26851091ff394641a007b42e6cc6c490', name: 'الصوت الجديد' },
+    { id: '26851091ff394641a007b42e6cc6c490', name: 'أوناهانا' },
+    { id: '3f476f6678714e1598914a208a816e47', name: 'كيسامي' },
+    { id: '0c00fdac48be4501bacb9618559d2448', name: 'هاميتس' },
+    { id: '5347edc8a80b45d797c1605083e48279', name: 'أوروتشيمارو' },
+    { id: 'd866966fc5034c48a14f3a01cdc56ddd', name: 'سينجومارو' },
+    { id: 'f10fa58129c5407cb1d09181ad0328cf', name: 'صوت محفوظ f10fa581' },
+    { id: '63953a988a244cefb966fad3d33cb186', name: 'صوت محفوظ 63953a98' },
   ];
   const fishVoiceIdPattern = /^[a-f0-9]{32}$/i;
+  const voiceRecoveryKey = 'anime_voice_studio_restore_known_voices_20261118_v1';
+  function normalizeFishVoices(data) {
+    if (!Array.isArray(data)) return [];
+    const seen = new Set();
+    return data.filter(v => v && typeof v.id === 'string' && fishVoiceIdPattern.test(v.id) && typeof v.name === 'string' && v.name.trim() && !seen.has(v.id.toLowerCase()) && seen.add(v.id.toLowerCase())).slice(0, 100).map(v => ({id:v.id.toLowerCase(),name:v.name.trim().slice(0,60)}));
+  }
   function loadFishVoices() {
-    try {
-      const data = JSON.parse(localStorage.getItem(fishVoiceKey) || 'null');
-      if (!Array.isArray(data)) return defaultFishVoices.map(v => ({...v}));
-      const seen = new Set();
-      return data.filter(v => v && typeof v.id === 'string' && fishVoiceIdPattern.test(v.id) && typeof v.name === 'string' && v.name.trim() && !seen.has(v.id.toLowerCase()) && seen.add(v.id.toLowerCase())).slice(0, 100).map(v => ({ id: v.id.toLowerCase(), name: v.name.trim().slice(0, 60) }));
-    } catch { return defaultFishVoices.map(v => ({...v})); }
+    let saved = [];
+    try { saved = normalizeFishVoices(JSON.parse(localStorage.getItem(fishVoiceKey) || 'null')); }
+    catch (_) { saved = []; }
+    // One-time recovery, not continuous defaults: a manually deleted voice stays deleted.
+    let recoveryDone = false;
+    try { recoveryDone = localStorage.getItem(voiceRecoveryKey) === '1'; } catch (_) {}
+    if (!recoveryDone) {
+      const existingIds = new Set(saved.map(v => v.id));
+      for (const voice of defaultFishVoices) {
+        if (!existingIds.has(voice.id)) { saved.push({...voice}); existingIds.add(voice.id); }
+      }
+      try {
+        localStorage.setItem(fishVoiceKey, JSON.stringify(saved));
+        localStorage.setItem(voiceRecoveryKey, '1');
+      } catch (_) {}
+    }
+    return saved;
   }
   let fishVoices = loadFishVoices();
   function persistFishVoices() { localStorage.setItem(fishVoiceKey, JSON.stringify(fishVoices)); }
+  function exportFishVoices() {
+    const backup = {format:'anime-voice-studio-fish-voices-v1',exported_at:new Date().toISOString(),voices:fishVoices.map(v=>({id:v.id,name:v.name}))};
+    const url=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}));
+    const a=document.createElement('a');
+    a.href=url; a.download='anime-voice-studio-voices-backup.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),10000);
+    toast('تم تجهيز ملف الأصوات لنقله إلى جهاز آخر');
+  }
+  async function importFishVoices() {
+    const input=$('importFishVoicesFile');
+    const file=input.files?.[0];
+    if (!file) return;
+    if (file.size>100000) {input.value='';return toast('ملف قائمة الأصوات كبير جدًا');}
+    try {
+      const contents=JSON.parse(await file.text());
+      const entries=normalizeFishVoices(Array.isArray(contents)?contents:contents?.voices);
+      if (!entries.length) throw new Error('لم أجد معرّفات Fish Audio صحيحة في الملف');
+      let added=0,updated=0;
+      for (const voice of entries) {
+        const existing=fishVoices.find(v=>v.id===voice.id);
+        if (existing) {if(existing.name!==voice.name){existing.name=voice.name;updated++;}}
+        else if(fishVoices.length<100){fishVoices.push(voice);added++;}
+      }
+      persistFishVoices();
+      renderLibrary();
+      toast('تم استيراد '+added+' صوت وتحديث '+updated+' اسم. الأصوات القديمة محفوظة.');
+    }catch(err){toast('تعذر الاستيراد: '+(err.message||err));}
+    finally{input.value='';}
+  }
+  function renameFishVoice(voice) {
+    const name=prompt('اكتب الاسم الجديد للصوت:',voice.name);
+    if(name===null)return;
+    const trimmed=name.trim().slice(0,60);
+    if(!trimmed)return toast('اسم الصوت لا يمكن أن يكون فارغًا');
+    voice.name=trimmed;
+    persistFishVoices();
+    renderLibrary();
+    toast('تم تعديل اسم الصوت في هذا الجهاز');
+  }
   function selectedFishVoice() {
     const value = $('voiceSelect').value;
     if (!value.startsWith('fish:')) return null;
@@ -423,7 +506,7 @@ window.AVS_CONFIG = {
     $('generateBtn').textContent = 'جارٍ توليد النسختين...';
     clearGeneratedAudio();
     $('generationStatus').textContent = 'جارٍ توليد نسختين مستقلتين بصوت «' + fishVoice.name + '»...';
-    const createData = () => {
+    const createData = take => {
       const data = new FormData();
       data.set('text', text);
       data.set('reference_id', fishVoice.id);
@@ -431,14 +514,17 @@ window.AVS_CONFIG = {
       data.set('emotion', state.emotion);
       data.set('intensity', $('intensity').value);
       data.set('direction', $('performanceDirection').value.trim());
+      data.set('override_preset', $('overridePerformancePreset').checked ? 'true' : 'false');
       data.set('speed', (+$('speed').value / 100).toFixed(2));
+      data.set('volume_db', $('volume').value);
+      data.set('take', String(take));
       return data;
     };
-    const oneTake = async () => {
+    const oneTake = async take => {
       const response = await fetch(url + '/generate', {
         method: 'POST',
         headers: { Authorization: 'Bearer ' + authToken() },
-        body: createData(),
+        body: createData(take),
         cache: 'no-store',
       });
       if (!response.ok) throw new Error(await parseApiError(response, 'تعذر التوليد'));
@@ -447,7 +533,7 @@ window.AVS_CONFIG = {
       return audio;
     };
     try {
-      const results = await Promise.allSettled([oneTake(), oneTake()]);
+      const results = await Promise.allSettled([oneTake(1), oneTake(2)]);
       let completed = 0;
       const errors = [];
       for (let idx = 0; idx < 2; idx++) {
@@ -665,6 +751,7 @@ window.AVS_CONFIG = {
       addText(fb, 'p', 'صوت محفوظ في Fish Audio');
       const actions = addText(fishCard, 'div', '', 'card-actions');
       actions.appendChild(actionButton('↗', 'اختيار الصوت في الاستوديو', () => { showScreen('studio'); $('voiceSelect').value = 'fish:' + fv.id; localStorage.setItem(fishSelectedKey, fv.id); toast('تم اختيار «' + fv.name + '»'); }));
+      actions.appendChild(actionButton('✎', 'تعديل اسم الصوت', () => renameFishVoice(fv)));
       actions.appendChild(actionButton('✕', 'حذف من التطبيق فقط', () => { $('voiceSelect').value = 'fish:' + fv.id; removeFishVoice(); }));
     }
     for (const voice of state.voices) {
@@ -737,17 +824,45 @@ window.AVS_CONFIG = {
     $('languageTip').textContent = {ja:'Japanese script',en:'English script',ar:'Arabic script'}[lang];
   }
   $$('#languageSegment button').forEach(btn => btn.addEventListener('click', () => setLanguage(btn.dataset.lang)));
+  const takeDescriptions = {
+    Challenge: ['تحدٍ واثق ومسيطر عليه', 'تحدٍ أكثر استفزازًا وتهديدًا'],
+    Majestic: ['هيبة متزنة وملكية', 'هيبة أقوى وأكثر رهبة'],
+    Angry: ['غضب مكبوت ومسيطر عليه', 'غضب واضح وأكثر اشتعالًا'],
+    Sarcastic: ['سخرية ذكية وناعمة', 'سخرية حادة ولاذعة'],
+    Calm: ['هدوء طبيعي ومتزن', 'هدوء أعمق وأكثر برودًا'],
+    Sad: ['حزن هادئ ومكتوم', 'حزن عميق ومؤثر'],
+  };
+  function updateTakeDescriptions() {
+    const descriptions = takeDescriptions[state.emotion] || takeDescriptions.Challenge;
+    const power = Number($('intensity').value);
+    const degree = power <= 20 ? 'خفيفة جدًا' : power <= 45 ? 'خفيفة' : power <= 70 ? 'متوسطة' : power <= 85 ? 'واضحة' : 'شديدة';
+    $('takeAExplanation').textContent = 'الأولى: ' + descriptions[0] + ' — شدة ' + degree + '.';
+    $('takeBExplanation').textContent = 'الثانية: ' + descriptions[1] + ' — شدة ' + degree + '.';
+    $('takeACaption').textContent = descriptions[0];
+    $('takeBCaption').textContent = descriptions[1];
+  }
   $$('#emotionGroup button').forEach(btn => btn.addEventListener('click', () => {
     state.emotion = btn.dataset.emotion;
     $$('#emotionGroup button').forEach(b => b.classList.toggle('chosen', b === btn));
+    updateTakeDescriptions();
   }));
-  for (const [id, output, unit] of [['intensity','intensityOut','%'],['volume','volumeOut','%'],['speed','speedOut','×']]) {
-    $(id).addEventListener('input', () => { $(output).textContent = (id === 'speed' ? (Number($(id).value) / 100).toFixed(2) : $(id).value) + unit; });
+  for (const id of ['intensity', 'volume', 'speed']) {
+    $(id).addEventListener('input', () => {
+      if (id === 'speed') $('speedOut').textContent = (Number($('speed').value) / 100).toFixed(2) + '×';
+      else if (id === 'volume') $('volumeOut').textContent = (Number($('volume').value) > 0 ? '+' : '') + $('volume').value + ' dB';
+      else { $('intensityOut').textContent = $('intensity').value + '%'; updateTakeDescriptions(); }
+    });
   }
+  updateTakeDescriptions();
   const performanceDirectionKey = 'avs_performance_direction_v1';
   try { $('performanceDirection').value = localStorage.getItem(performanceDirectionKey) || ''; } catch (_) {}
   $('performanceDirection').addEventListener('input', () => {
     try { localStorage.setItem(performanceDirectionKey, $('performanceDirection').value); } catch (_) {}
+  });
+  const overridePresetKey = 'avs_override_emotion_preset_v1';
+  try { $('overridePerformancePreset').checked = localStorage.getItem(overridePresetKey) === 'true'; } catch (_) {}
+  $('overridePerformancePreset').addEventListener('change', () => {
+    try { localStorage.setItem(overridePresetKey, $('overridePerformancePreset').checked ? 'true' : 'false'); } catch (_) {}
   });
   $('scriptInput').addEventListener('input', () => $('charCount').textContent = $('scriptInput').value.length + ' / 1200');
   $('saveDraftBtn').addEventListener('click', async () => {
@@ -776,8 +891,11 @@ window.AVS_CONFIG = {
     $('scriptInput').value = draft.script;
     $('draftName').value = draft.title;
     $('intensity').value = draft.intensity;
-    $('volume').value = draft.volume;
-    $('speed').value = Math.round(draft.speed * 100);
+    // Older saved drafts used a 0-100 display-only volume slider; 40 was its default.
+    // Keep these drafts compatible with the new actual dB control.
+    const savedVolume = Number(draft.volume);
+    $('volume').value = Number.isFinite(savedVolume) && savedVolume >= -6 && savedVolume <= 6 ? savedVolume : 0;
+    $('speed').value = Math.max(90, Math.min(110, Math.round((Number(draft.speed) || 1) * 100 / 5) * 5));
     ['intensity','volume','speed'].forEach(id => $(id).dispatchEvent(new Event('input')));
     const emotionButton = $(`#emotionGroup button[data-emotion="${CSS.escape(draft.emotion)}"]`);
     if (emotionButton) emotionButton.click();
@@ -1006,6 +1124,8 @@ window.AVS_CONFIG = {
     $('createFishVoiceBtn').addEventListener('click', createFishVoice);
     $('addFishVoiceBtn').addEventListener('click', addFishVoice);
     $('removeFishVoiceBtn').addEventListener('click', removeFishVoice);
+    $('exportFishVoicesBtn').addEventListener('click', exportFishVoices);
+    $('importFishVoicesFile').addEventListener('change', importFishVoices);
     $('voiceSelect').addEventListener('change', () => {
       const fv = selectedFishVoice();
       if (fv) localStorage.setItem(fishSelectedKey, fv.id);
