@@ -117,20 +117,20 @@
             <button data-emotion="Calm">❄️ هدوء</button>
             <button data-emotion="Sad">☁ حزن</button>
           </div>
-          <label class="field-label" for="performanceDirection">توجيه الأداء المسرحي — اختياري (Drama 3)</label>
-          <textarea id="performanceDirection" rows="3" maxlength="320" spellcheck="false" placeholder="مثال: بصوت عميق، ملكي ومهيب، ببطء محسوب، مع وقفات درامية قصيرة ودون صراخ"></textarea>
-          <p class="inline-note">التوجيه الذي تكتبه يكمل الشعور المختار. يمكنك أيضًا استخدام وسوم داخل النص مثل [cold, restrained anger].</p>
+          <label class="field-label" for="performanceDirection">توجيه أداء S2.1 — اختياري</label>
+          <textarea id="performanceDirection" rows="3" maxlength="320" spellcheck="false" placeholder="للنص الياباني: توجيه ياباني قصير فقط. أو اترك الحقل فارغًا للمشاعر الجاهزة"></textarea>
+          <p class="inline-note">لثبات النطق في S2.1: اكتب الحوار فقط، بدون تعليمات إنجليزية طويلة أو وسوم Drama 3. استخدم شعورًا من الأزرار؛ وإن رغبت بتوجيه يدوي فاكتبه قصيرًا بلغة الحوار نفسها (اليابانية للحوارات اليابانية).</p>
           <label class="inline-note" style="display:flex;align-items:flex-start;gap:9px"><input type="checkbox" id="overridePerformancePreset" style="margin-top:4px;flex:none" /> <span>استخدم توجيهي اليدوي فقط، دون وصف الشعور الجاهز (اختياري).</span></label>
           <div class="range-block"><div><label for="intensity">قوة التعبير التمثيلي (توجيه تقريبي)</label><output id="intensityOut">70%</output></div><input type="range" id="intensity" min="0" max="100" value="70" step="5" /></div>
           <p class="inline-note">كلما رفعت القوة، يصبح وصف الأداء أشد تعبيرًا؛ النسبة ليست قيمة فعلية داخل نموذج Fish Audio.</p>
           <div class="range-block"><div><label for="volume">مستوى الصوت الحقيقي (dB) — لا يغير الشعور</label><output id="volumeOut">0 dB</output></div><input type="range" id="volume" min="-6" max="6" value="0" step="1" /></div>
-          <div class="range-block"><div><label for="speed">سرعة النطق (يفضل 1.00×)</label><output id="speedOut">1.00×</output></div><input type="range" id="speed" min="90" max="110" value="100" step="5" /></div>
-          <p class="inline-note">للإلقاء البطيء أو الوقفات الثقيلة، صف ذلك في التوجيه بدل خفض سرعة التوليد كثيرًا لتجنب الطابع الآلي.</p>
+          <div class="range-block"><div><label for="speed">سرعة النطق (يفضل 1.00×)</label><output id="speedOut">1.00×</output></div><input type="range" id="speed" min="95" max="105" value="100" step="5" /></div>
+          <p class="inline-note">S2.1: اترك السرعة 1.00× لتقليل التشوه. ولأفضل نتيجة جرّب جملتين أو ثلاثًا في كل توليد (100–350 حرفًا) دون تعليمات مسرحية طويلة.</p>
           <div class="form-card" style="padding:12px;margin:10px 0" aria-live="polite">
             <b>🎭 نسختان لنفس الشعور ونفس الشخصية</b>
             <p class="inline-note" id="takeAExplanation">النتيجة الأولى: تحدٍ واثق ومسيطر عليه.</p>
             <p class="inline-note" id="takeBExplanation">النتيجة الثانية: تحدٍ أكثر استفزازًا وتهديدًا.</p>
-            <p class="inline-note">كل نسخة لها توجيه تمثيلي ودرجة تنوع مختلفة؛ لا نغيّر الشخصية أو النص.</p>
+            <p class="inline-note">في S2.1: كل نسخة بنفس الصوت والنص والشعور، مع اختلاف قصير في طريقة الإلقاء ودرجة تنوع منخفضة؛ لا نضمن الاختلاف في كل مرة.</p>
           </div>
           <label class="field-label" for="draftName">اسم المشهد للحفظ</label>
           <input id="draftName" maxlength="80" placeholder="مثل: إعلان التحدي" />
@@ -899,7 +899,7 @@ window.AVS_CONFIG = {
     // Keep these drafts compatible with the new actual dB control.
     const savedVolume = Number(draft.volume);
     $('volume').value = Number.isFinite(savedVolume) && savedVolume >= -6 && savedVolume <= 6 ? savedVolume : 0;
-    $('speed').value = Math.max(90, Math.min(110, Math.round((Number(draft.speed) || 1) * 100 / 5) * 5));
+    $('speed').value = Math.max(95, Math.min(105, Math.round((Number(draft.speed) || 1) * 100 / 5) * 5));
     ['intensity','volume','speed'].forEach(id => $(id).dispatchEvent(new Event('input')));
     const emotionButton = $(`#emotionGroup button[data-emotion="${CSS.escape(draft.emotion)}"]`);
     if (emotionButton) emotionButton.click();
