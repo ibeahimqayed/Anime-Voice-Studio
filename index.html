@@ -64,7 +64,7 @@
           <button class="feature" data-nav="studio"><span class="feature-icon cyan">◈</span><span><b>Anime Director</b><small>تحدٍ، هيبة، غضب، سخرية والمزيد</small></span><span class="chevron">‹</span></button>
           <button class="feature" data-nav="account"><span class="feature-icon amber">◎</span><span><b>Cloud Account</b><small>اربط حسابك للمزامنة بين الأجهزة</small></span><span class="chevron">‹</span></button>
         </div>
-        <p class="small-hint">التوليد عبر Fish Audio بعد ربط خادم Cloudflare. يمكنك اختيار أصوات Fish متعددة من الاستوديو، وإضافة المزيد بروابطها.</p>
+        <p class="small-hint">التوليد عبر Fish Audio أو IndexTTS 2.5 بعد ربط خادم المحرك المناسب. يمكنك اختيار أصوات Fish متعددة من الاستوديو، وإضافة المزيد بروابطها.</p>
       </section>
 
       <section class="screen" data-screen="studio">
@@ -77,9 +77,30 @@
           <label class="field-label" for="scriptInput">النص</label>
           <textarea id="scriptInput" placeholder="اكتب حوار الشخصية هنا..." rows="5" maxlength="1200" spellcheck="false"></textarea>
           <div class="field-meta"><span id="charCount">0 / 1200</span><span id="languageTip">Japanese script</span></div>
+          <label class="field-label" for="ttsEngine">محرك الصوت</label>
+          <select id="ttsEngine" aria-label="اختر محرك تحويل النص إلى صوت">
+            <option value="fish">Fish Audio — S2.1 Pro Free (نتيجتان)</option>
+            <option value="index">IndexTTS 2.5 (نتيجة واحدة)</option>
+          </select>
+          <div id="fishVoiceChooser">
           <label class="field-label" for="voiceSelect">اختر الصوت — Fish Audio</label>
           <select id="voiceSelect"><option value="">جاري تحميل الأصوات...</option></select>
-          <p class="inline-note">الصوت المحدد يُستخدم في التوليد. تُحفظ قائمة أصوات Fish محليًا على هذا الجهاز.</p>
+          <p class="inline-note">أصوات Fish التسعة محفوظة كما هي، ولا تحتاج لإضافتها مجددًا. IndexTTS يحتاج عينة مرجعية مرتبطة بالصوت؛ إذا سبق حفظ العينة على هذا الجهاز، سيستخدمها تلقائيًا.</p>
+          </div>
+          <div id="indexVoiceChooser" class="form-card" style="margin-top:12px;padding:12px" hidden>
+            <b>🎧 صوت IndexTTS 2.5</b>
+            <p class="inline-note">اختر اسم الصوت الموجود في مكتبتك. إذا كانت له عينة مرجعية محفوظة في هذا المتصفح فسيُستخدم مباشرة. معرّف Fish وحده لا يحتوي على التسجيل الصوتي.</p>
+            <label class="field-label" for="indexVoiceSelect">اختر أحد أصوات مكتبتك</label>
+            <select id="indexVoiceSelect"><option value="">جاري تحميل الأصوات المحفوظة...</option></select>
+            <p class="inline-note" id="indexReferenceStatus" aria-live="polite">اختر صوتًا لمراجعة وجود عينته المرجعية.</p>
+            <label class="field-label" for="indexReferenceFile">إرفاق عينة جديدة لهذا الصوت (عند الحاجة فقط، حتى 30MB)</label>
+            <input id="indexReferenceFile" type="file" accept="audio/*,video/mp4,video/quicktime,.wav,.mp3,.m4a,.mp4,.mov,.m4v" />
+            <p class="inline-note">إذا كانت العينة محفوظة فلن تحتاج إلى رفعها مرة أخرى. إذا كان للصوت معرّف Fish فقط، اختر عينة مرجعية مرة واحدة ثم اضغط «حفظ العينة لهذا الصوت». تُحفظ العينة على هذا المتصفح، ويمكن استخدامها لاحقًا دون رفع الملف مجددًا. يجب أن تكون العينة واضحة وبتصريح.</p>
+            <label class="consent-row"><input type="checkbox" id="indexConsent" /> أؤكد أن لدي الحق في استخدام هذا الصوت</label>
+            <button type="button" id="indexSaveReferenceBtn" class="btn outline full">◉ حفظ العينة لهذا الصوت (مرة واحدة)</button>
+            <p class="inline-note">نموذج IndexTTS مستقل عن Fish Audio. يستخدم مشاعر رقمية لا تعليمات Drama 3، وقد لا يستجيب بنفس المستوى التمثيلي.</p>
+          </div>
+          <div id="fishCloneAndCatalog">
           <div class="form-card" style="margin-top:10px;padding:12px">
             <b>🎙️ استنساخ صوت جديد من تسجيل أو فيديو</b>
             <p class="inline-note">اختر عينة تحتوي على متحدث واحد وصوت واضح. سيستخرج التطبيق 25 ثانية كحد أقصى بدءًا من الوقت الذي تحدده، ويحفظ الصوت بشكل خاص في حساب Fish Audio المرتبط بمفتاح الخادم.</p>
@@ -108,6 +129,7 @@
             <button type="button" id="addFishVoiceBtn" class="btn outline full">＋ حفظ الصوت في قائمتي</button>
             <button type="button" id="removeFishVoiceBtn" class="link-button">حذف الصوت المحدد من قائمة Fish</button>
           </div>
+          </div>
           <div class="field-head"><label class="field-label">أسلوب الأداء</label><small>لا يحدد مستوى الصراخ</small></div>
           <div class="emotion-chips" id="emotionGroup" role="group" aria-label="المشاعر">
             <button data-emotion="Challenge" class="chosen">⚔️ تحدي</button>
@@ -126,7 +148,7 @@
           <div class="range-block"><div><label for="volume">مستوى الصوت الحقيقي (dB) — لا يغير الشعور</label><output id="volumeOut">0 dB</output></div><input type="range" id="volume" min="-6" max="6" value="0" step="1" /></div>
           <div class="range-block"><div><label for="speed">سرعة النطق (يفضل 1.00×)</label><output id="speedOut">1.00×</output></div><input type="range" id="speed" min="95" max="105" value="100" step="5" /></div>
           <p class="inline-note">S2.1: اترك السرعة 1.00× لتقليل التشوه. ولأفضل نتيجة جرّب جملتين أو ثلاثًا في كل توليد (100–350 حرفًا) دون تعليمات مسرحية طويلة.</p>
-          <div class="form-card" style="padding:12px;margin:10px 0" aria-live="polite">
+          <div class="form-card" id="dualTakeInfo" style="padding:12px;margin:10px 0" aria-live="polite">
             <b>🎭 نسختان لنفس الشعور ونفس الشخصية</b>
             <p class="inline-note" id="takeAExplanation">النتيجة الأولى: تحدٍ واثق ومسيطر عليه.</p>
             <p class="inline-note" id="takeBExplanation">النتيجة الثانية: تحدٍ أكثر استفزازًا وتهديدًا.</p>
@@ -136,12 +158,12 @@
           <input id="draftName" maxlength="80" placeholder="مثل: إعلان التحدي" />
           <button class="btn primary full" id="saveDraftBtn">حفظ المشهد في المكتبة</button>
           <button class="btn primary full" id="generateBtn" type="button">◉ توليد نسختين من الصوت</button>
-          <p class="inline-note">كل ضغطة تُرسل طلبي توليد مستقلين إلى Fish Audio؛ قد يترتب عليهما ضعف تكلفة توليد نسخة واحدة.</p>
+          <p class="inline-note" id="engineCostNote">Fish Audio يولد نتيجتين؛ IndexTTS يولد نتيجة واحدة فقط، ويحتاج خادم GPU مستقلاً.</p>
           <p class="inline-note" id="generationStatus" role="status" aria-live="polite">اربط خادم الصوت من تبويب الحساب. بعد الربط يمكنك كتابة النص واختيار الصوت المحفوظ لتوليد تسجيل WAV.</p>
           <div id="generationResult" class="generation-result" hidden>
-            <b>اختر النتيجة التي تفضلها</b>
+            <b id="generationResultTitle">اختر النتيجة التي تفضلها</b>
             <div id="generatedBox1" class="form-card" style="margin:10px 0;padding:12px" hidden>
-              <b>🎧 النتيجة الأولى — أداء متزن</b>
+              <b id="firstTakeTitle">🎧 النتيجة الأولى — أداء متزن</b>
               <p class="inline-note" id="takeACaption"></p>
               <audio id="generatedAudio1" controls preload="none" style="width:100%;margin:9px 0"></audio>
               <a class="btn outline full download-btn" id="downloadGenerated1" download="anime-voice-1.wav">↓ حفظ النتيجة الأولى WAV</a>
@@ -199,6 +221,20 @@
           <button type="button" id="checkEngineBtn" class="btn outline full">فحص الاتصال وحفظ الإعدادات</button>
           <p id="engineStatus" class="inline-note" role="status" aria-live="polite">لم يتم ربط المحرك بعد.</p>
           <p class="inline-note">العنوان يُحفظ في هذا المتصفح. المفتاح يبقى في جلسة المتصفح فقط ولا يُرفع إلى GitHub ضمن ملفات التطبيق. لا تضع المفتاح في config.js.</p>
+        </div>
+        <div class="form-card engine-panel" id="indexEngineSettings">
+          <h2>IndexTTS 2.5 — Hugging Face ZeroGPU (مستقل عن Fish Audio)</h2>
+          <p class="inline-note">بعد إنشاء Space مجانٍ بنظام ZeroGPU على Hugging Face، ضع رابط Space وكلمة المرور السرية المضافة في إعداداته. إعدادات Fish Audio تبقى كما هي.</p>
+          <label class="field-label" for="indexApiUrlInput">رابط IndexTTS Space على Hugging Face (HTTPS)</label>
+          <input id="indexApiUrlInput" type="url" dir="ltr" autocomplete="url" spellcheck="false" placeholder="https://huggingface.co/spaces/USERNAME/anime-voice-indextts" />
+          <label class="field-label" for="indexApiTokenInput">كلمة مرور IndexTTS الخاصة بك</label>
+          <input id="indexApiTokenInput" type="password" autocomplete="off" dir="ltr" placeholder="AVS_SPACE_TOKEN من أسرار Hugging Face" />
+          <label class="field-label" for="indexHfReadTokenInput">مفتاح Hugging Face للقراءة (اختياري)</label>
+          <input id="indexHfReadTokenInput" type="password" autocomplete="off" dir="ltr" placeholder="hf_... (صلاحية read فقط)" />
+          <p class="inline-note">مفتاح Hugging Face الشخصي اختياري ويسمح باستخدام حصة حسابك المجاني (عادةً 5 دقائق GPU يوميًا بدل دقيقتين دون تسجيل). أنشئ مفتاحًا للقراءة فقط، ولا تضعه في ملفات GitHub أو Space.</p>
+          <button id="checkIndexEngineBtn" type="button" class="btn outline full">فحص اتصال IndexTTS وحفظ الإعدادات</button>
+          <p id="indexEngineStatus" class="inline-note" role="status" aria-live="polite">لم يتم ربط Hugging Face Space بعد.</p>
+          <p class="inline-note">العينات الصوتية تُرفع إلى مساحة Hugging Face وتعالجها Gradio، وقد تبقى في ذاكرة التخزين المؤقت حتى تنظيفها. لا تستخدمها مع تسجيلات سرية. المفتاح لا يُضاف إلى GitHub؛ يُحفظ محليًا لجلسة المتصفح فقط.</p>
         </div>
         <div class="info-card"><b>خصوصية التسجيلات</b><p>الملفات المحلية تحفظها مساحة المتصفح وقد تزول عند مسح بيانات الموقع. عند ربط Supabase تُحفظ التسجيلات في مخزن خاص بحسابك. لا ترفع إلا صوتًا تملكه أو لديك إذن باستخدامه.</p></div>
       </section>
@@ -278,6 +314,9 @@ window.AVS_CONFIG = {
   const apiTokenKey = 'anime_voice_studio_api_token_session';
   const fishVoiceKey = 'anime_voice_studio_fish_voices_v1';
   const fishSelectedKey = 'anime_voice_studio_selected_fish_v1';
+  const ttsEngineKey = 'anime_voice_studio_tts_engine_v1';
+  const indexApiUrlKey = 'anime_voice_studio_index_api_url_v1';
+  const indexApiTokenKey = 'anime_voice_studio_index_token_session_v1';
   // Approved names and IDs are taken verbatim from the owner's exported JSON backup.
   // When preparing future updates, preserve this catalog unless the owner supplies a newer export.
   const defaultFishVoices = [
@@ -461,6 +500,136 @@ window.AVS_CONFIG = {
     $('generationResult').hidden = true;
   }
   function apiBase() { return $('apiUrlInput').value.trim().replace(/\/+$/, ''); }
+  function indexApiBase() { return $('indexApiUrlInput').value.trim().replace(/\/+$/, ''); }
+  function indexAuthToken() { return $('indexApiTokenInput').value.trim(); }
+  function isIndexEngine() { return $('ttsEngine').value === 'index'; }
+  function updateEngineView() {
+    const index = isIndexEngine();
+    $('fishVoiceChooser').hidden = index;
+    $('fishCloneAndCatalog').hidden = index;
+    $('indexVoiceChooser').hidden = !index;
+    $('dualTakeInfo').hidden = index;
+    $('generationResultTitle').textContent = index ? 'التسجيل الناتج من IndexTTS' : 'اختر النتيجة التي تفضلها';
+    $('firstTakeTitle').textContent = index ? '🎧 نتيجة IndexTTS' : '🎧 النتيجة الأولى — أداء متزن';
+    $('generateBtn').textContent = index ? '◉ توليد صوت واحد' : '◉ توليد نسختين من الصوت';
+    $('engineCostNote').textContent = index
+      ? 'IndexTTS يولد نتيجة واحدة فقط؛ يحتاج إلى Space متاح على Hugging Face أو خادم GPU، وقد تنفد حصته المجانية.'
+      : 'Fish Audio يولد نسختين مستقلتين باستخدام قائمة الأصوات المحفوظة لديك.';
+    // Do not display a Fish result as if it were a newly generated Index result.
+    if (!generating) clearGeneratedAudio();
+    try { localStorage.setItem(ttsEngineKey, index ? 'index' : 'fish'); } catch (_) {}
+    if (index) updateIndexReferenceStatus();
+  }
+  const indexFishSamplePrefix = 'avs_indextts_reference_for_fish_';
+  const indexFishSampleKey = id => indexFishSamplePrefix + id;
+  function indexSelectedVoice() {
+    const selected = $('indexVoiceSelect').value;
+    if (selected.startsWith('fish:')) {
+      const fish = fishVoices.find(v => 'fish:' + v.id === selected);
+      return fish ? {kind:'fish', id:fish.id, name:fish.name} : null;
+    }
+    if (selected.startsWith('saved:')) {
+      const voice = state.voices.find(v => v.kind === 'cloned' && 'saved:' + v.id === selected);
+      return voice ? {kind:'saved', voice, name:voice.title} : null;
+    }
+    return null;
+  }
+  let indexStatusRequestId = 0;
+  async function updateIndexReferenceStatus() {
+    const requestId = ++indexStatusRequestId;
+    const status = $('indexReferenceStatus');
+    const selected = indexSelectedVoice();
+    const direct = $('indexReferenceFile').files?.[0];
+    if (!selected) { status.textContent = direct ? 'يمكنك حفظ الملف بعد اختيار اسم الصوت من القائمة.' : 'اختر صوتًا من مكتبتك.'; return; }
+    if (direct) { status.textContent = 'تم اختيار ملف جديد لـ «' + selected.name + '». اضغط حفظ العينة لهذا الصوت حتى لا تضطر إلى اختياره مرة أخرى.'; return; }
+    if (selected.kind === 'saved') { status.textContent = '✓ التسجيل المرجعي لـ «' + selected.name + '» موجود في مكتبة الأصوات. لا تحتاج إلى رفعه.'; return; }
+    try {
+      const saved = await loadReferenceLocal(indexFishSampleKey(selected.id));
+      if (requestId !== indexStatusRequestId) return;
+      status.textContent = saved?.blob ? '✓ عينة «' + selected.name + '» محفوظة على هذا المتصفح. يمكنك توليد الصوت مباشرة.' : '«' + selected.name + '» محفوظ كمعرّف Fish فقط. لا يوجد ملف مرجعي لـ IndexTTS على هذا الجهاز؛ اربطه مرة واحدة.';
+    } catch (err) { if (requestId === indexStatusRequestId) status.textContent = 'تعذّر فحص الملف المرجعي المحلي: ' + (err.message || err); }
+  }
+  function renderIndexVoices() {
+    const select = $('indexVoiceSelect');
+    const old = select.value;
+    select.replaceChildren(new Option('اختر الصوت من مكتبتك', ''));
+    const fishGroup = document.createElement('optgroup');
+    fishGroup.label = 'الأصوات التسعة في Fish Audio — تحتاج عينة Index عند أول استخدام';
+    for (const fish of fishVoices) fishGroup.appendChild(new Option('🎙️ ' + fish.name, 'fish:' + fish.id));
+    select.appendChild(fishGroup);
+    const stored = state.voices.filter(v => v.kind === 'cloned');
+    if (stored.length) {
+      const savedGroup = document.createElement('optgroup');
+      savedGroup.label = 'تسجيلات مرجعية محفوظة في التطبيق';
+      for (const voice of stored) savedGroup.appendChild(new Option('✓ ' + voice.title, 'saved:' + voice.id));
+      select.appendChild(savedGroup);
+    }
+    if ([...select.options].some(o => o.value === old)) select.value = old;
+    else {
+      const selectedFish = $('voiceSelect').value;
+      if (selectedFish && [...select.options].some(o => o.value === selectedFish)) select.value = selectedFish;
+      else if (select.options.length > 1) select.selectedIndex = 1;
+    }
+    updateIndexReferenceStatus();
+  }
+  async function saveIndexSample() {
+    const selected = indexSelectedVoice();
+    if (!selected) return toast('اختر اسم صوت من القائمة أولًا');
+    if (selected.kind === 'saved') return toast('هذا التسجيل محفوظ بالفعل في المكتبة؛ لا تحتاج إلى حفظه مرة أخرى');
+    const file = $('indexReferenceFile').files?.[0];
+    if (!file) return toast('إن كانت العينة محفوظة يمكنك التوليد مباشرة؛ وإلا اختر ملفًا صوتيًا مرة واحدة');
+    if (!$('indexConsent').checked) return toast('أكّد أن لديك حق استخدام هذا الصوت أولًا');
+    if (!file.size || file.size > 30*1024*1024) return toast('الملف يجب ألا يتجاوز 30MB');
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!referenceTypes[ext]) return toast('صيغة الملف غير مدعومة؛ اختر WAV أو MP3 أو M4A أو MP4 أو MOV');
+    try {
+      await mediaTransaction('put',indexFishSampleKey(selected.id),{blob:file,name:file.name,type:file.type});
+      $('indexReferenceFile').value = '';
+      await updateIndexReferenceStatus();
+      toast('✓ تم ربط عينة «' + selected.name + '» وحفظها على هذا الجهاز. لن تحتاج إلى رفعها لاحقًا.');
+    } catch (err) {toast('فشل حفظ العينة: ' + (err.message || err));}
+  }
+  let indexGradioClient = null, indexGradioUrl = '', indexGradioToken = '';
+  const indexHfTokenKey = 'avs_indextts_hf_read_token_session_v1';
+  function hfSpaceTarget(url) {
+    const u = new URL(url);
+    const sections = u.pathname.split('/').filter(Boolean);
+    if (u.hostname === 'huggingface.co' && sections[0] === 'spaces' && sections.length >= 3) {
+      return sections[1] + '/' + sections[2];
+    }
+    return url;
+  }
+  async function connectIndexSpace(url) {
+    const hfToken = $('indexHfReadTokenInput').value.trim();
+    if (hfToken && !/^hf_[a-zA-Z0-9]+$/.test(hfToken)) throw new Error('رمز Hugging Face يجب أن يبدأ بـ hf_');
+    if (indexGradioClient && indexGradioUrl === url && indexGradioToken === hfToken) return indexGradioClient;
+    const { Client } = await import('https://cdn.jsdelivr.net/npm/@gradio/client/+esm');
+    const connection = await Client.connect(hfSpaceTarget(url), hfToken ? { token: hfToken } : {});
+    indexGradioClient = connection;
+    indexGradioUrl = url;
+    indexGradioToken = hfToken;
+    return connection;
+  }
+  async function checkIndexEngine() {
+    const url = indexApiBase();
+    if (!validEndpoint(url)) return toast('أدخل رابط Hugging Face Space صحيحًا');
+    if (!indexAuthToken()) return toast('أدخل AVS_SPACE_TOKEN الذي أنشأته في أسرار Space');
+    $('indexEngineStatus').textContent = 'جارٍ اختبار اتصال Hugging Face Space...';
+    $('checkIndexEngineBtn').disabled = true;
+    try {
+      const connection = await connectIndexSpace(url);
+      const endpoints = await connection.view_api();
+      if (!JSON.stringify(endpoints).includes('/generate')) throw new Error('هذا Space لا يحتوي على واجهة IndexTTS /generate');
+      localStorage.setItem(indexApiUrlKey, url);
+      sessionStorage.setItem(indexApiTokenKey, indexAuthToken());
+      sessionStorage.setItem(indexHfTokenKey, $('indexHfReadTokenInput').value.trim());
+      $('indexEngineStatus').textContent = '✓ متصل بـ Hugging Face Space — التوليد يخضع لحصة ZeroGPU اليومية';
+      toast('تم ربط IndexTTS على Hugging Face');
+    } catch(e) {
+      indexGradioClient = null;
+      $('indexEngineStatus').textContent = 'تعذر الاتصال بـ Space: ' + (e.message || e);
+    } finally { $('checkIndexEngineBtn').disabled = false; }
+  }
   function validEndpoint(url) {
     try { const u = new URL(url); return u.protocol === 'https:' || (u.protocol === 'http:' && ['localhost','127.0.0.1'].includes(u.hostname)); }
     catch { return false; }
@@ -500,36 +669,89 @@ window.AVS_CONFIG = {
     const text = $('scriptInput').value.trim();
     if (!text) return toast('اكتب النص الذي تريد أن تنطقه الشخصية');
     if (text.length > 1200) return toast('الحد الحالي 1200 حرف لكل توليد');
-    const url = apiBase();
-    if (!validEndpoint(url)) { showScreen('account'); return toast('اربط خادم Fish Audio من صفحة الحساب أولًا'); }
-    if (!authToken()) { showScreen('account'); return toast('ضع مفتاح الخادم في صفحة الحساب'); }
-    const fishVoice = selectedFishVoice();
-    if (!fishVoice) return toast('اختر الصوت من قائمة Fish Audio أولًا');
+    const useIndex = isIndexEngine();
+    const url = useIndex ? indexApiBase() : apiBase();
+    const token = useIndex ? indexAuthToken() : authToken();
+    if (!validEndpoint(url)) { showScreen('account'); return toast('أدخل رابط خادم ' + (useIndex ? 'IndexTTS' : 'Fish Audio') + ' أولًا'); }
+    if (!token) { showScreen('account'); return toast('أدخل مفتاح خادم التوليد أولًا'); }
+    const fishVoice = !useIndex ? selectedFishVoice() : null;
+    if (!useIndex && !fishVoice) return toast('اختر صوت Fish Audio أولًا');
+    let reference = null, clipStart = 0, clipEnd = 0, voiceName = fishVoice?.name || 'الملف المرجعي';
+    if (useIndex) {
+      const direct = $('indexReferenceFile').files?.[0];
+      const selected = indexSelectedVoice();
+      if (!selected) return toast('اختر صوتًا موجودًا في مكتبتك أولًا');
+      if (direct && !$('indexConsent').checked) return toast('أكّد حق استخدام العينة الجديدة أولًا');
+      try {
+        if (direct) {
+          if (direct.size > 30*1024*1024 || !direct.size) return toast('الملف يجب ألا يتجاوز 30MB');
+          const ext = direct.name.split('.').pop().toLowerCase();
+          if (!referenceTypes[ext]) return toast('صيغة المرجع غير مدعومة');
+          reference = direct;
+          voiceName = selected.name;
+        } else if (selected.kind === 'saved') {
+          reference = await getReferenceFile(selected.voice);
+          clipStart = Math.max(0, Number(selected.voice.config?.clip_start) || 0);
+          clipEnd = Number(selected.voice.config?.clip_end) || 0;
+          voiceName = selected.name;
+        } else {
+          const stored = await loadReferenceLocal(indexFishSampleKey(selected.id));
+          if (!stored?.blob) return toast('هذا الصوت محفوظ في Fish Audio بمعرّف فقط، وليس له تسجيل مرجعي لـ IndexTTS. أرفق عينة له مرة واحدة.');
+          reference = new File([stored.blob], stored.name || 'reference.wav', {type:stored.type || stored.blob.type || 'application/octet-stream'});
+          voiceName = selected.name;
+        }
+      } catch(e) { return toast('تعذّر تحميل التسجيل المحفوظ: ' + (e.message || e)); }
+    }
     generating = true;
     $('generateBtn').disabled = true;
-    $('generateBtn').textContent = 'جارٍ توليد النسختين...';
+    $('ttsEngine').disabled = true;
+    $('generateBtn').textContent = useIndex ? 'جارٍ توليد الصوت...' : 'جارٍ توليد النسختين...';
     clearGeneratedAudio();
-    $('generationStatus').textContent = 'جارٍ توليد نسختين مستقلتين بصوت «' + fishVoice.name + '»...';
+    $('generationStatus').textContent = 'جارٍ توليد ' + (useIndex ? 'نتيجة واحدة' : 'نسختين') + ' عبر ' + (useIndex ? 'IndexTTS 2.5' : 'Fish Audio') + ' بصوت «' + voiceName + '»...';
     const createData = take => {
       const data = new FormData();
       data.set('text', text);
-      data.set('reference_id', fishVoice.id);
       data.set('language', state.language);
       data.set('emotion', state.emotion);
       data.set('intensity', $('intensity').value);
-      data.set('direction', $('performanceDirection').value.trim());
-      data.set('override_preset', $('overridePerformancePreset').checked ? 'true' : 'false');
       data.set('speed', (+$('speed').value / 100).toFixed(2));
       data.set('volume_db', $('volume').value);
       data.set('take', String(take));
+      if (useIndex) {
+        data.set('reference', reference, reference.name);
+        data.set('clip_start', String(clipStart));
+        data.set('clip_end', String(clipEnd));
+        data.set('has_permission', 'true');
+      } else {
+        data.set('reference_id', fishVoice.id);
+        data.set('direction', $('performanceDirection').value.trim());
+        data.set('override_preset', $('overridePerformancePreset').checked ? 'true' : 'false');
+      }
       return data;
     };
     const oneTake = async take => {
+      if (useIndex) {
+        const { handle_file } = await import('https://cdn.jsdelivr.net/npm/@gradio/client/+esm');
+        const space = await connectIndexSpace(url);
+        // Gradio queues API calls and allocates ZeroGPU for the generator.
+        const result = await space.predict('/generate', [
+          text, handle_file(reference), state.language, state.emotion,
+          Number($('intensity').value), (+$('speed').value / 100),
+          Number($('volume').value), take, token, true,
+          clipStart, clipEnd,
+        ]);
+        const payload = result?.data?.[0];
+        const audioUrl = typeof payload === 'string' ? payload : payload?.url;
+        if (!audioUrl || !audioUrl.startsWith('https://')) throw new Error('لم يرجع Hugging Face ملف WAV صالحًا');
+        const response = await fetch(audioUrl);
+        if (!response.ok) throw new Error('تعذر تنزيل النتيجة من Space: ' + response.status);
+        const audio = await response.blob();
+        if (!audio.size) throw new Error('النتيجة الصوتية فارغة');
+        return audio;
+      }
       const response = await fetch(url + '/generate', {
-        method: 'POST',
-        headers: { Authorization: 'Bearer ' + authToken() },
-        body: createData(take),
-        cache: 'no-store',
+        method: 'POST', headers: { Authorization: 'Bearer ' + token },
+        body: createData(take), cache: 'no-store',
       });
       if (!response.ok) throw new Error(await parseApiError(response, 'تعذر التوليد'));
       const audio = await response.blob();
@@ -537,10 +759,13 @@ window.AVS_CONFIG = {
       return audio;
     };
     try {
-      const results = await Promise.allSettled([oneTake(1), oneTake(2)]);
+      // IndexTTS makes EXACTLY ONE backend call, Fish makes two separate calls.
+      const results = useIndex
+        ? [await oneTake(1).then(value => ({status:'fulfilled',value}), reason => ({status:'rejected',reason}))]
+        : await Promise.allSettled([oneTake(1), oneTake(2)]);
       let completed = 0;
       const errors = [];
-      for (let idx = 0; idx < 2; idx++) {
+      for (let idx = 0; idx < results.length; idx++) {
         const result = results[idx];
         if (result.status === 'rejected') {
           errors.push('النتيجة ' + (idx + 1) + ': ' + (result.reason?.message || 'فشلت'));
@@ -552,26 +777,28 @@ window.AVS_CONFIG = {
         generatedUrls[idx] = outputUrl;
         $('generatedAudio' + target).src = outputUrl;
         $('downloadGenerated' + target).href = outputUrl;
-        $('downloadGenerated' + target).download = 'anime-voice-' + target + '-' + Date.now() + '.wav';
+        $('downloadGenerated' + target).download = (useIndex ? 'indextts-' : 'fish-') + target + '-' + Date.now() + '.wav';
         $('generatedBox' + target).hidden = false;
       }
       $('generationResult').hidden = completed === 0;
-      if (completed === 2) {
-        $('generationStatus').textContent = 'اكتمل توليد نتيجتين بصوت «' + fishVoice.name + '». استمع وقارن بينهما.';
+      if (useIndex && completed === 1) {
+        $('generationStatus').textContent = '✓ اكتمل توليد صوت واحد بواسطة IndexTTS 2.5 بصوت «' + voiceName + '».';
+        toast('تم توليد نتيجة IndexTTS واحدة بنجاح');
+      } else if (!useIndex && completed === 2) {
+        $('generationStatus').textContent = 'اكتمل توليد نتيجتين بصوت «' + voiceName + '». استمع وقارن بينهما.';
         toast('تم توليد نتيجتين بنجاح');
       } else if (completed === 1) {
         $('generationStatus').textContent = 'تم توليد نتيجة واحدة. ' + errors.join(' / ');
         toast('نجحت نتيجة واحدة من نتيجتين');
-      } else {
-        throw new Error(errors.join(' / '));
-      }
+      } else throw new Error(errors.join(' / '));
     } catch (err) {
       $('generationStatus').textContent = 'تعذر توليد الصوت: ' + (err.message || err);
       toast('فشل التوليد؛ راجع الرسالة الموجودة تحت الزر');
     } finally {
       generating = false;
       $('generateBtn').disabled = false;
-      $('generateBtn').textContent = '◉ توليد نسختين من الصوت';
+      $('ttsEngine').disabled = false;
+      $('generateBtn').textContent = useIndex ? '◉ توليد صوت واحد' : '◉ توليد نسختين من الصوت';
     }
   }
 
@@ -755,6 +982,7 @@ window.AVS_CONFIG = {
       addText(fb, 'p', 'صوت محفوظ في Fish Audio');
       const actions = addText(fishCard, 'div', '', 'card-actions');
       actions.appendChild(actionButton('↗', 'اختيار الصوت في الاستوديو', () => { showScreen('studio'); $('voiceSelect').value = 'fish:' + fv.id; localStorage.setItem(fishSelectedKey, fv.id); toast('تم اختيار «' + fv.name + '»'); }));
+      actions.appendChild(actionButton('🎧', 'تجربة الصوت بمحرك IndexTTS', () => { showScreen('studio'); $('ttsEngine').value = 'index'; updateEngineView(); $('indexVoiceSelect').value = 'fish:' + fv.id; updateIndexReferenceStatus(); toast('اخترت «' + fv.name + '» بمحرك IndexTTS'); }));
       actions.appendChild(actionButton('✎', 'تعديل اسم الصوت', () => renameFishVoice(fv)));
       actions.appendChild(actionButton('✕', 'حذف من التطبيق فقط', () => { $('voiceSelect').value = 'fish:' + fv.id; removeFishVoice(); }));
     }
@@ -769,12 +997,13 @@ window.AVS_CONFIG = {
       addText(tags, 'span', voice.kind === 'cloned' ? 'مرجع صوتي' : 'تصميم أصلي');
       const actions = addText(card, 'div', '', 'card-actions');
       if (voice.kind === 'cloned') actions.appendChild(actionButton('▶', 'تشغيل التسجيل المرجعي', () => playReference(voice)));
-      actions.appendChild(actionButton('↗', 'عرض تنبيه دعم الملفات المحلية', () => { showScreen('studio'); toast('ملفات الصوت المحلية القديمة غير مدعومة في خادم Fish الحالي؛ اختر صوت Fish من القائمة'); }));
+      if (voice.kind === 'cloned') actions.appendChild(actionButton('↗', 'اختيار مرجع IndexTTS في الاستوديو', () => { showScreen('studio'); $('ttsEngine').value = 'index'; updateEngineView(); $('indexVoiceSelect').value = 'saved:' + voice.id; updateIndexReferenceStatus(); toast('تم اختيار مرجع «' + voice.title + '» في IndexTTS'); }));
       actions.appendChild(actionButton('✕', 'حذف الصوت', () => removeVoice(voice)));
     }
     if (!state.voices.length && !fishVoices.length) voicesList.appendChild(emptyNode('لم تضف أي صوت بعد. أضف رابط Fish Audio من الاستوديو.'));
     const preferred = selected.startsWith('fish:') ? selected : ('fish:' + (localStorage.getItem(fishSelectedKey) || '539134ff5139467c9f29cd898844fe3a'));
     voiceSelect.value = [...voiceSelect.options].some(opt => opt.value === preferred) ? preferred : (fishVoices.length ? 'fish:' + fishVoices[0].id : '');
+    renderIndexVoices();
     for (const draft of state.drafts) {
       const card = addText(draftsList, 'div', '', 'collection-card');
       addText(card, 'div', '✎', 'collection-icon');
@@ -1123,6 +1352,23 @@ window.AVS_CONFIG = {
     $('apiUrlInput').value = localStorage.getItem(apiUrlKey) || config.apiBaseUrl || '';
     $('apiTokenInput').value = sessionStorage.getItem(apiTokenKey) || '';
     $('checkEngineBtn').addEventListener('click', checkEngine);
+    $('ttsEngine').value = localStorage.getItem(ttsEngineKey) === 'index' ? 'index' : 'fish';
+    $('ttsEngine').addEventListener('change', updateEngineView);
+    updateEngineView();
+    $('indexApiUrlInput').value = localStorage.getItem(indexApiUrlKey) || '';
+    $('indexApiTokenInput').value = sessionStorage.getItem(indexApiTokenKey) || '';
+    $('indexHfReadTokenInput').value = sessionStorage.getItem(indexHfTokenKey) || '';
+    $('checkIndexEngineBtn').addEventListener('click', checkIndexEngine);
+    $('indexReferenceFile').addEventListener('change', () => {
+      const file = $('indexReferenceFile').files?.[0];
+      if (file && file.size > 30*1024*1024) { $('indexReferenceFile').value=''; toast('الملف أكبر من 30MB'); }
+      updateIndexReferenceStatus();
+    });
+    $('indexSaveReferenceBtn').addEventListener('click', saveIndexSample);
+    $('indexVoiceSelect').addEventListener('change', () => {
+      $('indexReferenceFile').value = '';
+      updateIndexReferenceStatus();
+    });
     $('generateBtn').addEventListener('click', generateAudio);
     $('cloneSourceFile').addEventListener('change', chooseCloneFile);
     $('createFishVoiceBtn').addEventListener('click', createFishVoice);
