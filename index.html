@@ -778,7 +778,49 @@ window.AVS_CONFIG = {
             Number($('volume').value), take, token, true, clipStart, clipEnd
           ]);
         }
-        const payload = result?.data?.[0];
+       
+const payload = result?.data?.[0];
+const file = payload?.value ?? payload;
+
+let audioUrl = typeof file === 'string'
+  ? file
+  : (file?.url || file?.path || file?.name || '');
+
+if (!audioUrl) {
+  console.error('IndexTTS response:', result);
+  throw new Error(
+    'لم يرجع المحرك رابطًا أو مسارًا صوتيًا. ' +
+    'نوع النتيجة: ' + JSON.stringify(payload).slice(0, 300)
+  );
+}
+
+if (!/^https?:\/\//i.test(audioUrl)) {
+  const host = isOfficialIndexSpace(url)
+    ? 'https://indexteam-indextts-2-5-demo.hf.space'
+    : new URL(url).origin;
+
+  if (audioUrl.startsWith('/gradio_api/file=') ||
+      audioUrl.startsWith('/file=')) {
+    audioUrl = host + audioUrl;
+  } else {
+    audioUrl = host + '/gradio_api/file=' +
+      audioUrl.split('/').map(encodeURIComponent).join('/');
+  }
+}
+
+const response = await fetch(audioUrl);
+if (!response.ok) {
+  throw new Error('تعذر تنزيل الصوت: HTTP ' + response.status);
+}
+
+const audio = await response.blob();
+if (!audio.size || audio.type.includes('text/html') ||
+    audio.type.includes('application/json')) {
+  throw new Error('الخادم لم يرجع بيانات صوتية: ' + audio.type);
+}
+
+return audio;
+
 const audioData = payload?.value ?? payload;
 const audioUrl = typeof audioData === 'string'
   ? audioData
