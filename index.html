@@ -224,11 +224,11 @@
         </div>
         <div class="form-card engine-panel" id="indexEngineSettings">
           <h2>IndexTTS 2.5 — Hugging Face ZeroGPU (مستقل عن Fish Audio)</h2>
-          <p class="inline-note">بعد إنشاء Space مجانٍ بنظام ZeroGPU على Hugging Face، ضع رابط Space وكلمة المرور السرية المضافة في إعداداته. إعدادات Fish Audio تبقى كما هي.</p>
+          <p class="inline-note">استخدم العرض الرسمي العام IndexTTS 2.5 دون إنشاء Space جديد أو انتظار 30 يومًا. يُرسل التسجيل المرجعي إلى خادم العرض العام، وقد تتأخر الطلبات أو تنفد الحصة. إعدادات Fish Audio لا تتغير.</p>
           <label class="field-label" for="indexApiUrlInput">رابط IndexTTS Space على Hugging Face (HTTPS)</label>
-          <input id="indexApiUrlInput" type="url" dir="ltr" autocomplete="url" spellcheck="false" placeholder="https://huggingface.co/spaces/USERNAME/anime-voice-indextts" />
-          <label class="field-label" for="indexApiTokenInput">كلمة مرور IndexTTS الخاصة بك</label>
-          <input id="indexApiTokenInput" type="password" autocomplete="off" dir="ltr" placeholder="AVS_SPACE_TOKEN من أسرار Hugging Face" />
+          <input id="indexApiUrlInput" type="url" dir="ltr" autocomplete="url" spellcheck="false" placeholder="https://huggingface.co/spaces/IndexTeam/IndexTTS-2.5-Demo" />
+          <div id="indexPrivateSettings" hidden><label class="field-label" for="indexApiTokenInput">كلمة مرور الخادم الخاص (غير مطلوبة للعرض الرسمي)</label>
+          <input id="indexApiTokenInput" type="password" autocomplete="off" dir="ltr" placeholder="AVS_SPACE_TOKEN للخادم الخاص فقط" /></div>
           <label class="field-label" for="indexHfReadTokenInput">مفتاح Hugging Face للقراءة (اختياري)</label>
           <input id="indexHfReadTokenInput" type="password" autocomplete="off" dir="ltr" placeholder="hf_... (صلاحية read فقط)" />
           <p class="inline-note">مفتاح Hugging Face الشخصي اختياري ويسمح باستخدام حصة حسابك المجاني (عادةً 5 دقائق GPU يوميًا بدل دقيقتين دون تسجيل). أنشئ مفتاحًا للقراءة فقط، ولا تضعه في ملفات GitHub أو Space.</p>
@@ -317,6 +317,7 @@ window.AVS_CONFIG = {
   const ttsEngineKey = 'anime_voice_studio_tts_engine_v1';
   const indexApiUrlKey = 'anime_voice_studio_index_api_url_v1';
   const indexApiTokenKey = 'anime_voice_studio_index_token_session_v1';
+  const officialIndexSpace = 'https://huggingface.co/spaces/IndexTeam/IndexTTS-2.5-Demo';
   // Approved names and IDs are taken verbatim from the owner's exported JSON backup.
   // When preparing future updates, preserve this catalog unless the owner supplies a newer export.
   const defaultFishVoices = [
@@ -502,6 +503,15 @@ window.AVS_CONFIG = {
   function apiBase() { return $('apiUrlInput').value.trim().replace(/\/+$/, ''); }
   function indexApiBase() { return $('indexApiUrlInput').value.trim().replace(/\/+$/, ''); }
   function indexAuthToken() { return $('indexApiTokenInput').value.trim(); }
+  function isOfficialIndexSpace(url) {
+    try { return hfSpaceTarget(url).toLowerCase() === 'indexteam/indextts-2.5-demo'; }
+    catch (_) { return false; }
+  }
+  function updateIndexAuthView() {
+    const official = isOfficialIndexSpace(indexApiBase());
+    $('indexPrivateSettings').hidden = official;
+    $('checkIndexEngineBtn').textContent = official ? 'فحص اتصال العرض الرسمي وحفظ الرابط' : 'فحص اتصال خادم IndexTTS الخاص';
+  }
   function isIndexEngine() { return $('ttsEngine').value === 'index'; }
   function updateEngineView() {
     const index = isIndexEngine();
@@ -610,24 +620,35 @@ window.AVS_CONFIG = {
     indexGradioToken = hfToken;
     return connection;
   }
+  function officialEmotionVector(emotion, intensity) {
+    // Joy, anger, sadness, fear, disgust, depression, surprise, calm.
+    const presets = {
+      Challenge:[0,.38,0,0,0,0,.05,.30], Majestic:[0,0,0,0,0,0,.10,.8],
+      Angry:[0,.95,0,0,0,0,0,.05], Sarcastic:[.25,0,0,0,.18,0,.12,.25],
+      Calm:[0,0,0,0,0,0,0,.85], Sad:[0,0,.75,0,0,.3,0,0]
+    };
+    const scale = Math.max(0,Math.min(1,Number(intensity)/100));
+    return (presets[emotion] || presets.Calm).map(x=>+(x*scale).toFixed(2));
+  }
   async function checkIndexEngine() {
-    const url = indexApiBase();
-    if (!validEndpoint(url)) return toast('أدخل رابط Hugging Face Space صحيحًا');
-    if (!indexAuthToken()) return toast('أدخل AVS_SPACE_TOKEN الذي أنشأته في أسرار Space');
-    $('indexEngineStatus').textContent = 'جارٍ اختبار اتصال Hugging Face Space...';
+    const url = indexApiBase(), official = isOfficialIndexSpace(url);
+    if (!validEndpoint(url)) return toast('أدخل رابط Hugging Face Space صالحًا');
+    if (!official && !indexAuthToken()) return toast('أدخل مفتاح الخادم الخاص');
     $('checkIndexEngineBtn').disabled = true;
+    $('indexEngineStatus').textContent = 'جارٍ فحص الاتصال...';
     try {
       const connection = await connectIndexSpace(url);
-      const endpoints = await connection.view_api();
-      if (!JSON.stringify(endpoints).includes('/generate')) throw new Error('هذا Space لا يحتوي على واجهة IndexTTS /generate');
-      localStorage.setItem(indexApiUrlKey, url);
-      sessionStorage.setItem(indexApiTokenKey, indexAuthToken());
-      sessionStorage.setItem(indexHfTokenKey, $('indexHfReadTokenInput').value.trim());
-      $('indexEngineStatus').textContent = '✓ متصل بـ Hugging Face Space — التوليد يخضع لحصة ZeroGPU اليومية';
-      toast('تم ربط IndexTTS على Hugging Face');
-    } catch(e) {
+      const api = await connection.view_api();
+      const endpoint = official ? '/gen_single' : '/generate';
+      if (!JSON.stringify(api).includes(endpoint)) throw new Error('واجهة '+endpoint+' غير متاحة. ربما تغيّر العرض أو توقف.');
+      localStorage.setItem(indexApiUrlKey,url);
+      if (!official) sessionStorage.setItem(indexApiTokenKey,indexAuthToken());
+      sessionStorage.setItem(indexHfTokenKey,$('indexHfReadTokenInput').value.trim());
+      $('indexEngineStatus').textContent = official ? '✓ العرض الرسمي متصل — لا يحتاج كلمة مرور خاصة' : '✓ الخادم الخاص متصل';
+      toast('تم حفظ رابط IndexTTS');
+    } catch(err) {
       indexGradioClient = null;
-      $('indexEngineStatus').textContent = 'تعذر الاتصال بـ Space: ' + (e.message || e);
+      $('indexEngineStatus').textContent = 'تعذر الاتصال: '+(err.message || err);
     } finally { $('checkIndexEngineBtn').disabled = false; }
   }
   function validEndpoint(url) {
@@ -673,7 +694,7 @@ window.AVS_CONFIG = {
     const url = useIndex ? indexApiBase() : apiBase();
     const token = useIndex ? indexAuthToken() : authToken();
     if (!validEndpoint(url)) { showScreen('account'); return toast('أدخل رابط خادم ' + (useIndex ? 'IndexTTS' : 'Fish Audio') + ' أولًا'); }
-    if (!token) { showScreen('account'); return toast('أدخل مفتاح خادم التوليد أولًا'); }
+    if (!token && !(useIndex && isOfficialIndexSpace(url))) { showScreen('account'); return toast('أدخل مفتاح خادم التوليد أولًا'); }
     const fishVoice = !useIndex ? selectedFishVoice() : null;
     if (!useIndex && !fishVoice) return toast('اختر صوت Fish Audio أولًا');
     let reference = null, clipStart = 0, clipEnd = 0, voiceName = fishVoice?.name || 'الملف المرجعي';
@@ -734,12 +755,29 @@ window.AVS_CONFIG = {
         const { handle_file } = await import('https://cdn.jsdelivr.net/npm/@gradio/client/+esm');
         const space = await connectIndexSpace(url);
         // Gradio queues API calls and allocates ZeroGPU for the generator.
-        const result = await space.predict('/generate', [
-          text, handle_file(reference), state.language, state.emotion,
-          Number($('intensity').value), (+$('speed').value / 100),
-          Number($('volume').value), take, token, true,
-          clipStart, clipEnd,
-        ]);
+        let result;
+        if (isOfficialIndexSpace(url)) {
+          // Official IndexTeam demo: emotion mode is an index (2 = vector control).
+          // It expects an audio reference file, not the Fish Audio voice ID.
+          let sample = reference;
+          const extension = sample.name.split('.').pop()?.toLowerCase();
+          if (clipStart > 0 || ['mp4','mov','m4v'].includes(extension)) sample = await extractWavClip(sample,clipStart);
+          const lang = {ja:'JA', ar:'AR', en:'EN'}[state.language] || 'JA';
+          // The duration factor is inverse to speed: >1 means slower.
+          const durationFactor = +(1/(+$('speed').value/100)).toFixed(2);
+          result = await space.predict('/gen_single', [
+            2, handle_file(sample), text, lang, null, .65,
+            ...officialEmotionVector(state.emotion,$('intensity').value),
+            '', false, 120, durationFactor,
+            true, .8, 30, .8, 0, 3, 10, 1500
+          ]);
+        } else {
+          result = await space.predict('/generate', [
+            text, handle_file(reference), state.language, state.emotion,
+            Number($('intensity').value), (+$('speed').value/100),
+            Number($('volume').value), take, token, true, clipStart, clipEnd
+          ]);
+        }
         const payload = result?.data?.[0];
         const audioUrl = typeof payload === 'string' ? payload : payload?.url;
         if (!audioUrl || !audioUrl.startsWith('https://')) throw new Error('لم يرجع Hugging Face ملف WAV صالحًا');
@@ -1355,7 +1393,10 @@ window.AVS_CONFIG = {
     $('ttsEngine').value = localStorage.getItem(ttsEngineKey) === 'index' ? 'index' : 'fish';
     $('ttsEngine').addEventListener('change', updateEngineView);
     updateEngineView();
-    $('indexApiUrlInput').value = localStorage.getItem(indexApiUrlKey) || '';
+    const previousIndexUrl = localStorage.getItem(indexApiUrlKey) || '';
+    $('indexApiUrlInput').value = (!previousIndexUrl || /\.workers\.dev\/?$/i.test(previousIndexUrl)) ? officialIndexSpace : previousIndexUrl;
+    $('indexApiUrlInput').addEventListener('input', updateIndexAuthView);
+    updateIndexAuthView();
     $('indexApiTokenInput').value = sessionStorage.getItem(indexApiTokenKey) || '';
     $('indexHfReadTokenInput').value = sessionStorage.getItem(indexHfTokenKey) || '';
     $('checkIndexEngineBtn').addEventListener('click', checkIndexEngine);
