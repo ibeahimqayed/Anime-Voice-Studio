@@ -766,7 +766,7 @@ window.AVS_CONFIG = {
           // The duration factor is inverse to speed: >1 means slower.
           const durationFactor = +(1/(+$('speed').value/100)).toFixed(2);
           result = await space.predict('/gen_single', [
-            2, handle_file(sample), text, lang, null, .65,
+          "Use emotion vectors", handle_file(sample), text, lang, null, .65,
             ...officialEmotionVector(state.emotion,$('intensity').value),
             '', false, 120, durationFactor,
             true, .8, 30, .8, 0, 3, 10, 1500
