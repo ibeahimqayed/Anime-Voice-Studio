@@ -779,7 +779,10 @@ window.AVS_CONFIG = {
           ]);
         }
         const payload = result?.data?.[0];
-        const audioUrl = typeof payload === 'string' ? payload : payload?.url;
+const audioData = payload?.value ?? payload;
+const audioUrl = typeof audioData === 'string'
+  ? audioData
+  : audioData?.url;
         if (!audioUrl || !audioUrl.startsWith('https://')) throw new Error('لم يرجع Hugging Face ملف WAV صالحًا');
         const response = await fetch(audioUrl);
         if (!response.ok) throw new Error('تعذر تنزيل النتيجة من Space: ' + response.status);
