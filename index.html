@@ -820,15 +820,6 @@ if (!audio.size || audio.type.includes('text/html') ||
 }
 
 return audio;
-  const audioUrl = typeof audioData === 'string'
-  ? audioData
-  : audioData?.url;
-        if (!audioUrl || !audioUrl.startsWith('https://')) throw new Error('لم يرجع Hugging Face ملف WAV صالحًا');
-        const response = await fetch(audioUrl);
-        if (!response.ok) throw new Error('تعذر تنزيل النتيجة من Space: ' + response.status);
-        const audio = await response.blob();
-        if (!audio.size) throw new Error('النتيجة الصوتية فارغة');
-        return audio;
       }
       const response = await fetch(url + '/generate', {
         method: 'POST', headers: { Authorization: 'Bearer ' + token },
