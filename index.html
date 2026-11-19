@@ -26,8 +26,8 @@
   <div class="app-shell">
     <header class="topbar">
       <div class="brand-logo" aria-hidden="true"><span>AV</span><i></i></div>
-      <div class="brand-text"><b>ANIME VOICE</b><small>STUDIO · Chatterbox Multilingual & Fish</small></div>
-      <div id="cloudIndicator" class="status-pill">Chatterbox HF</div>
+      <div class="brand-text"><b>ANIME VOICE</b><small>STUDIO · Fish Audio & Chatterbox</small></div>
+      <div id="cloudIndicator" class="status-pill">جاهز للعمل</div>
     </header>
 
     <main id="mainContent">
@@ -35,7 +35,7 @@
         <div class="hero">
           <div class="eyebrow">YOUR VOICE · YOUR ANIME</div>
           <h1>أعطِ شخصيتك<br/><em>صوتًا لا يُنسى.</em></h1>
-          <p>تحكم في الانفعال التمثيلي من تسجيل صوتي واحد باليابانية والإنجليزية والعربية مجانًا.</p>
+          <p>استنساخ صوتك أو التحكم في الانفعال التمثيلي من تسجيل واحد باليابانية والإنجليزية والعربية.</p>
           <button type="button" class="btn primary" data-nav="studio">ابدأ مشهدًا جديدًا <span>←</span></button>
           <div class="hero-spark" aria-hidden="true">✦</div>
         </div>
@@ -48,13 +48,13 @@
         <div class="feature-list">
           <button type="button" class="feature" data-nav="library"><span class="feature-icon purple">◉</span><span><b>Voice Library</b><small>أصواتك التسعة وعيناتك المحفوظة</small></span><span class="chevron">‹</span></button>
           <button type="button" class="feature" data-nav="studio"><span class="feature-icon cyan">◈</span><span><b>Anime Director</b><small>تحدٍ، هيبة، غضب، سخرية والمزيد</small></span><span class="chevron">‹</span></button>
-          <button type="button" class="feature" data-nav="account"><span class="feature-icon amber">◎</span><span><b>Engine Settings</b><small>مفتاح Hugging Face المجاني وربط Fish</small></span><span class="chevron">‹</span></button>
+          <button type="button" class="feature" data-nav="account"><span class="feature-icon amber">◎</span><span><b>Engine Settings</b><small>إعدادات Fish Audio و Chatterbox</small></span><span class="chevron">‹</span></button>
         </div>
-        <p class="small-hint">يعمل مباشرة من الآيفون عبر Chatterbox Multilingual على Hugging Face ZeroGPU مجانًا، أو عبر Fish Audio S2.1 Pro.</p>
+        <p class="small-hint">يعمل مع خادم Fish Audio S2.1 Pro أو عبر Chatterbox Multilingual (مباشرة أو عبر Cloudflare Worker).</p>
       </section>
 
       <section class="screen" data-screen="studio">
-        <div class="page-intro"><span class="eyebrow">VOICE DIRECTION</span><h1>محرر الأداء</h1><p>اختر الشخصية والشعور لتوليد نسختين بأداء تمثيلي مختلف من تسجيل واحد.</p></div>
+        <div class="page-intro"><span class="eyebrow">VOICE DIRECTION</span><h1>محرر الأداء</h1><p>اختر المحرك والشخصية لتوليد نسختين بأداء تمثيلي مختلف.</p></div>
         <div class="form-card">
           <label class="field-label" id="languageLabel">لغة النص</label>
           <div class="segmented" id="languageSegment" role="group" aria-labelledby="languageLabel">
@@ -65,17 +65,17 @@
           <div class="field-meta"><span id="charCount">0 / 1200</span><span id="languageTip">Japanese script</span></div>
           <label class="field-label" for="ttsEngine">محرك الصوت</label>
           <select id="ttsEngine" aria-label="اختر محرك تحويل النص إلى صوت">
-            <option value="chatterbox">Chatterbox Multilingual — Hugging Face مجاني (ياباني/عربي · نتيجتان)</option>
             <option value="fish">Fish Audio — S2.1 Pro Free (نتيجتان)</option>
+            <option value="chatterbox">Chatterbox Multilingual — ياباني/عربي من عينة واحدة (نتيجتان)</option>
           </select>
 
-          <div id="fishVoiceChooser" hidden>
+          <div id="fishVoiceChooser">
             <label class="field-label" for="voiceSelect">اختر الصوت — Fish Audio</label>
             <select id="voiceSelect"><option value="">جاري تحميل الأصوات...</option></select>
             <p class="inline-note">أصوات Fish التسعة محفوظة كما هي. يلتزم S2.1 بنبرة التسجيل المرجعي الأصلي.</p>
           </div>
 
-          <div id="chatterboxVoiceChooser" class="form-card" style="margin-top:12px;padding:12px">
+          <div id="chatterboxVoiceChooser" class="form-card" style="margin-top:12px;padding:12px" hidden>
             <b>🎧 صوت Chatterbox Multilingual (من عينة واحدة)</b>
             <p class="inline-note">اختر الشخصية من قائمتك. أرفق لها عينة صوتية واحدة صافية (3 إلى 25 ثانية) مرة واحدة فقط، وسيغيّر المحرك النبرة والانفعال تلقائيًا في كل مشهد.</p>
             <label class="field-label" for="indexVoiceSelect">اختر الشخصية</label>
@@ -97,7 +97,7 @@
             <button type="button" id="indexSaveReferenceBtn" class="btn outline full">◉ حفظ العينة لهذه الشخصية (مرة واحدة)</button>
           </div>
 
-          <div id="fishCloneAndCatalog" hidden>
+          <div id="fishCloneAndCatalog">
             <div class="form-card" style="margin-top:10px;padding:12px">
               <b>🎙️ استنساخ صوت جديد في Fish Audio</b>
               <p class="inline-note">اختر عينة تحتوي على متحدث واحد وصوت واضح (10–25 ثانية).</p>
@@ -138,16 +138,16 @@
             <button type="button" data-emotion="Sad">☁ حزن</button>
           </div>
 
-          <div id="fishDirectionWrap" hidden>
+          <div id="fishDirectionWrap">
             <label class="field-label" for="performanceDirection">توجيه أداء Fish S2.1 — اختياري</label>
             <textarea id="performanceDirection" rows="2" maxlength="320" spellcheck="false" placeholder="للنص الياباني: توجيه ياباني قصير فقط. أو اترك الحقل فارغًا"></textarea>
             <label class="inline-note" style="display:flex;align-items:flex-start;gap:9px"><input type="checkbox" id="overridePerformancePreset" style="margin-top:4px;flex:none" /> <span>استخدم توجيهي اليدوي فقط، دون وصف الشعور الجاهز.</span></label>
           </div>
 
           <div class="range-block"><div><label for="intensity">قوة التعبير التمثيلي (Exaggeration)</label><output id="intensityOut">70%</output></div><input type="range" id="intensity" min="0" max="100" value="70" step="5" /></div>
-          <p class="inline-note">كلما رفعت القوة زادت حدة التمثيل والانفعال الدرامي في Chatterbox.</p>
+          <p class="inline-note">كلما رفعت القوة زادت حدة التمثيل والانفعال الدرامي.</p>
 
-          <div id="fishExtraSliders" hidden>
+          <div id="fishExtraSliders">
             <div class="range-block"><div><label for="volume">مستوى الصوت (dB)</label><output id="volumeOut">0 dB</output></div><input type="range" id="volume" min="-6" max="6" value="0" step="1" /></div>
             <div class="range-block"><div><label for="speed">سرعة النطق</label><output id="speedOut">1.00×</output></div><input type="range" id="speed" min="95" max="105" value="100" step="5" /></div>
           </div>
@@ -162,8 +162,8 @@
           <input id="draftName" maxlength="80" placeholder="مثل: إعلان التحدي" />
           <button type="button" class="btn outline full" id="saveDraftBtn">حفظ المشهد في المكتبة</button>
           <button type="button" class="btn primary full" id="generateBtn">◉ توليد نسختين من الصوت</button>
-          <p class="inline-note" id="engineCostNote">Chatterbox Multilingual يولّد نسختين (متزنة وأكثر درامية) باليابانية أو العربية مجانًا عبر Hugging Face.</p>
-          <p class="inline-note" id="generationStatus" role="status" aria-live="polite">اختر الشخصية وأرفق عينتها الصوتية مرة واحدة، ثم اضغط «توليد نسختين من الصوت».</p>
+          <p class="inline-note" id="engineCostNote">Fish Audio يولد نسختين مستقلتين باستخدام قائمة الأصوات المحفوظة لديك.</p>
+          <p class="inline-note" id="generationStatus" role="status" aria-live="polite">اكتب النص واختر الصوت ثم اضغط «توليد نسختين من الصوت».</p>
 
           <div id="generationResult" class="generation-result" hidden>
             <b id="generationResultTitle">اختر النتيجة التي تفضلها</b>
@@ -185,7 +185,7 @@
 
       <section class="screen" data-screen="library">
         <div class="page-intro"><span class="eyebrow">MY COLLECTION</span><h1>مكتبة الأصوات</h1><p id="libraryStatus">أسماء الأصوات والملفات المرجعية محفوظة محليًا على هذا الجهاز.</p></div>
-        <div class="info-card"><b>أصواتك المحفوظة</b><p>جميع أصواتك التسعة محفوظة هنا. يمكنك ربط عينة صوتية واحدة بكل شخصية لاستخدامها مباشرة في محرك Chatterbox Multilingual.</p></div>
+        <div class="info-card"><b>أصواتك المحفوظة</b><p>جميع أصواتك التسعة محفوظة هنا. يمكنك ربط عينة صوتية واحدة بكل شخصية لاستخدامها في محرك Chatterbox Multilingual.</p></div>
         <div class="form-card" style="margin:12px 0;padding:13px">
           <b>↔ نقل قائمة الأصوات بين الكمبيوتر والجوال</b>
           <p class="inline-note">نزّل ملف القائمة ثم استورده في الجهاز الثاني لنقل أسماء الأصوات ومعرّفاتها.</p>
@@ -201,7 +201,7 @@
       </section>
 
       <section class="screen" data-screen="account">
-        <div class="page-intro"><span class="eyebrow">ENGINE SETTINGS</span><h1>إعدادات المحركات</h1><p>اربط حساب Hugging Face المجاني لزيادة حصة GPU اليومية، أو أضف خادم Fish Audio.</p></div>
+        <div class="page-intro"><span class="eyebrow">ENGINE SETTINGS</span><h1>إعدادات المحركات</h1><p>اربط خادم Fish Audio أو وسيط Chatterbox Multilingual.</p></div>
         <div id="accountDemo" class="info-card warn"><b>التخزين المحلي نشط</b><p>تُحفظ الأصوات والعينات الصوتية وإعدادات المحرك محليًا في متصفحك على هذا الجهاز.</p></div>
         <div id="authPanel" class="form-card" hidden>
           <div id="signedOutView">
@@ -214,27 +214,26 @@
           <div id="signedInView" hidden><div class="profile-avatar">✦</div><strong id="signedEmail"></strong><p>تم تسجيل الدخول.</p><button type="button" id="signOutBtn" class="btn outline full">تسجيل الخروج</button></div>
         </div>
 
-        <div class="form-card engine-panel" id="indexEngineSettings">
-          <h2>1. Chatterbox Multilingual — Hugging Face ZeroGPU (مجاني)</h2>
-          <p class="inline-note">يدعم اليابانية والعربية والإنجليزية من عينة صوتية واحدة دون الحاجة لخادم أو بطاقة دفع.</p>
-          <label class="field-label" for="indexApiUrlInput">مساحة Hugging Face Space</label>
-          <input id="indexApiUrlInput" type="url" dir="ltr" autocomplete="url" spellcheck="false" placeholder="https://huggingface.co/spaces/ResembleAI/Chatterbox-Multilingual-TTS" />
-          <label class="field-label" for="indexHfReadTokenInput">مفتاح Hugging Face للقراءة (hf_... — موصى به)</label>
-          <input id="indexHfReadTokenInput" type="password" autocomplete="off" dir="ltr" placeholder="hf_... (صلاحية read فقط)" />
-          <p class="inline-note">أنشئ مفتاح Read مجاني من إعدادات حسابك في Hugging Face للحصول على ~5 دقائق GPU يوميًا بدل دقيقتين للزوار. يُحفظ المفتاح محليًا في متصفحك ولا يُرفع إلى GitHub.</p>
-          <button type="button" id="checkIndexEngineBtn" class="btn outline full">فحص اتصال Chatterbox وحفظ الإعدادات</button>
-          <p id="indexEngineStatus" class="inline-note" role="status" aria-live="polite">المساحة الافتراضية جاهزة للاتصال.</p>
-        </div>
-
         <div class="form-card engine-panel">
-          <h2>2. محرك Fish Audio (S2.1 Pro)</h2>
-          <p class="inline-note">اختياري: أدخل عنوان Cloudflare Worker الخاص بمحرك Fish Audio ومفتاحه.</p>
+          <h2>1. محرك Fish Audio (S2.1 Pro)</h2>
+          <p class="inline-note">أدخل عنوان Cloudflare Worker الخاص بمحرك Fish Audio ومفتاحه.</p>
           <label class="field-label" for="apiUrlInput">عنوان الخادم (HTTPS)</label>
           <input id="apiUrlInput" type="url" dir="ltr" spellcheck="false" placeholder="https://your-server.example.com" autocomplete="url" />
           <label class="field-label" for="apiTokenInput">مفتاح الخادم السري</label>
           <input id="apiTokenInput" type="password" dir="ltr" spellcheck="false" placeholder="AVS_ACCESS_TOKEN" autocomplete="off" />
           <button type="button" id="checkEngineBtn" class="btn outline full">فحص اتصال Fish وحفظ الإعدادات</button>
           <p id="engineStatus" class="inline-note" role="status" aria-live="polite">لم يتم ربط خادم Fish بعد.</p>
+        </div>
+
+        <div class="form-card engine-panel" id="indexEngineSettings">
+          <h2>2. Chatterbox Multilingual (ياباني وعربي من عينة واحدة)</h2>
+          <p class="inline-note">يدعم اليابانية والعربية والإنجليزية من عينة صوتية واحدة (الحد الأقصى 300 حرف لكل جملة). ضع رابط وسيط Cloudflare Worker هنا إذا حظر المتصفح الاتصال المباشر بـ Hugging Face.</p>
+          <label class="field-label" for="indexApiUrlInput">رابط وسيط Worker أو مساحة Hugging Face</label>
+          <input id="indexApiUrlInput" type="url" dir="ltr" autocomplete="url" spellcheck="false" placeholder="https://chatterbox-proxy.your-name.workers.dev" />
+          <label class="field-label" for="indexHfReadTokenInput">مفتاح Hugging Face للقراءة (اختياري — اتركه فارغًا عند استخدام Worker)</label>
+          <input id="indexHfReadTokenInput" type="password" autocomplete="off" dir="ltr" placeholder="hf_... (اختياري)" />
+          <button type="button" id="checkIndexEngineBtn" class="btn outline full">فحص اتصال Chatterbox وحفظ الإعدادات</button>
+          <p id="indexEngineStatus" class="inline-note" role="status" aria-live="polite">جاهز للفحص بعد إدخال رابط الوسيط أو المساحة.</p>
         </div>
       </section>
     </main>
@@ -278,7 +277,7 @@ window.AVS_CONFIG = {
   const apiTokenKey = 'anime_voice_studio_api_token_v1';
   const fishVoiceKey = 'anime_voice_studio_fish_voices_v1';
   const fishSelectedKey = 'anime_voice_studio_selected_fish_v1';
-  const ttsEngineKey = 'anime_voice_studio_tts_engine_v2';
+  const ttsEngineKey = 'anime_voice_studio_tts_engine_v3';
   const hfSpaceUrlKey = 'anime_voice_studio_hf_space_url_v2';
   const hfReadTokenKey = 'avs_hf_read_token_v2';
   const officialChatterboxSpace = 'https://huggingface.co/spaces/ResembleAI/Chatterbox-Multilingual-TTS';
@@ -502,7 +501,7 @@ window.AVS_CONFIG = {
     $('firstTakeTitle').textContent = '🎧 النتيجة الأولى — أداء متزن';
     $('generateBtn').textContent = '◉ توليد نسختين من الصوت';
     $('engineCostNote').textContent = cb
-      ? 'Chatterbox Multilingual يولّد نسختين (متزنة وأكثر درامية) باليابانية أو العربية مجانًا عبر Hugging Face.'
+      ? 'Chatterbox Multilingual يولّد نسختين (متزنة وأكثر درامية) باليابانية أو العربية من عينة صوتية واحدة (الحد 300 حرف).'
       : 'Fish Audio يولد نسختين مستقلتين باستخدام قائمة الأصوات المحفوظة لديك.';
     if (!generating) clearGeneratedAudio();
     try { localStorage.setItem(ttsEngineKey, cb ? 'chatterbox' : 'fish'); } catch (_) {}
@@ -597,19 +596,16 @@ window.AVS_CONFIG = {
     try {
       const startSec = Math.max(0, Number($('sampleClipStart').value) || 0);
       const maxDur = Math.max(3, Math.min(25, Number($('sampleClipDuration').value) || 15));
-      let toStore = file;
-      const isVideo = ['mp4', 'mov', 'm4v'].includes(ext);
-      if (isVideo || startSec > 0 || file.size > 2.5 * 1024 * 1024) {
-        toStore = await extractWavClip(file, startSec, maxDur, 3);
-      }
+      // Always extract & trim to mono 24kHz WAV so duration limits and format compatibility are strictly respected.
+      const toStore = await extractWavClip(file, startSec, maxDur, 3);
       await mediaTransaction('put', indexFishSampleKey(selected.id), {
         blob: toStore,
-        name: toStore.name || file.name,
-        type: toStore.type || 'audio/wav'
+        name: 'reference_' + maxDur + 's.wav',
+        type: 'audio/wav'
       });
       $('indexReferenceFile').value = '';
       await updateIndexReferenceStatus();
-      toast('✓ حُفظت عينة «' + selected.name + '» على هذا الجهاز. لن تحتاج إلى رفعها مجددًا.');
+      toast('✓ حُفظت عينة «' + selected.name + '» (' + maxDur + 'ث) على هذا الجهاز.');
     } catch (err) {
       toast('فشل حفظ العينة: ' + (err.message || err));
     } finally {
@@ -704,13 +700,16 @@ window.AVS_CONFIG = {
       chosenSpec = allEndpoints[firstKey];
     }
 
+    let audioAssigned = false;
     const args = (chosenSpec.parameters || []).map(param => {
       const name = (param.parameter_name || '').toLowerCase();
       const label = (param.label || '').toLowerCase();
       const comp = (param.component || '').toLowerCase();
       const combined = name + ' ' + label;
 
-      if (comp === 'audio' || /audio|prompt|ref|voice/.test(combined)) {
+      // Match Audio component strictly (or first audio/ref parameter) to avoid misassigning non-audio fields.
+      if (!audioAssigned && (comp === 'audio' || (comp !== 'textbox' && comp !== 'dropdown' && comp !== 'slider' && comp !== 'number' && /audio|ref_wav|prompt_wav/.test(combined)))) {
+        audioAssigned = true;
         return handle_file(sampleFile);
       }
       if (/lang/.test(combined)) {
@@ -731,7 +730,9 @@ window.AVS_CONFIG = {
       if (comp === 'textbox' || /text|input|script/.test(combined)) {
         return text;
       }
-      return param.default !== undefined ? param.default : null;
+      if (param.parameter_default !== undefined) return param.parameter_default;
+      if (param.default !== undefined) return param.default;
+      return null;
     });
 
     return await space.predict(chosenEndpoint, args);
@@ -739,9 +740,9 @@ window.AVS_CONFIG = {
 
   async function checkIndexEngine() {
     const url = hfSpaceBase();
-    if (!validEndpoint(url)) return toast('أدخل رابط Hugging Face Space صالحًا');
+    if (!validEndpoint(url)) return toast('أدخل رابط وسيط Worker أو Hugging Face Space صالحًا');
     $('checkIndexEngineBtn').disabled = true;
-    $('indexEngineStatus').textContent = 'جارٍ فحص الاتصال بمساحة Chatterbox Multilingual...';
+    $('indexEngineStatus').textContent = 'جارٍ فحص الاتصال بـ Chatterbox Multilingual...';
     try {
       const connection = await connectHfSpace(url);
       const api = await connection.view_api();
@@ -836,9 +837,7 @@ window.AVS_CONFIG = {
           if (!referenceTypes[ext]) return toast('صيغة المرجع غير مدعومة');
           const startSec = Math.max(0, Number($('sampleClipStart').value) || 0);
           const maxDur = Math.max(3, Math.min(25, Number($('sampleClipDuration').value) || 15));
-          reference = (['mp4', 'mov', 'm4v'].includes(ext) || startSec > 0)
-            ? await extractWavClip(direct, startSec, maxDur, 3)
-            : direct;
+          reference = await extractWavClip(direct, startSec, maxDur, 3);
           voiceName = selected.name;
         } else if (selected.kind === 'saved') {
           reference = await getReferenceFile(selected.voice);
@@ -885,7 +884,8 @@ window.AVS_CONFIG = {
         const { handle_file } = await loadGradioModule();
         const space = await connectHfSpace(url);
         const params = chatterboxParams(state.emotion, $('intensity').value, take);
-        const dialogue = text.length > 320 ? text.slice(0, 320) : text;
+        // Official Chatterbox Multilingual Space enforces max_chars = 300.
+        const dialogue = text.length > 300 ? text.slice(0, 300) : text;
         const result = await runChatterboxSpaceCall(space, handle_file, reference, dialogue, state.language, params);
 
         const payload = result?.data?.[0];
@@ -971,7 +971,7 @@ window.AVS_CONFIG = {
     } catch (err) {
       let msg = err.message || String(err);
       if (/quota|exceeded|limit|zero.?gpu/i.test(msg)) {
-        msg = 'نفدت حصة ZeroGPU المؤقتة على Hugging Face. أضف مفتاح قراءة مجاني (hf_...) في تبويب «الحساب» أو انتظر قليلًا.';
+        msg = 'نفدت حصة ZeroGPU المؤقتة على Hugging Face. أضف مفتاح قراءة مجاني (hf_...) في إعدادات Worker أو انتظر قليلًا.';
       }
       $('generationStatus').textContent = 'تعذر توليد الصوت: ' + msg;
       toast('فشل التوليد؛ راجع الرسالة تحت الزر');
@@ -1164,14 +1164,6 @@ window.AVS_CONFIG = {
       addText(fb, 'b', fv.name);
       addText(fb, 'p', 'شخصية محفوظة');
       const actions = addText(fishCard, 'div', '', 'card-actions');
-      actions.appendChild(actionButton('🎧', 'اختيار في Chatterbox', () => {
-        showScreen('studio');
-        $('ttsEngine').value = 'chatterbox';
-        updateEngineView();
-        $('indexVoiceSelect').value = 'fish:' + fv.id;
-        updateIndexReferenceStatus();
-        toast('تم اختيار «' + fv.name + '» في Chatterbox');
-      }));
       actions.appendChild(actionButton('↗', 'اختيار في Fish Audio', () => {
         showScreen('studio');
         $('ttsEngine').value = 'fish';
@@ -1179,6 +1171,14 @@ window.AVS_CONFIG = {
         $('voiceSelect').value = 'fish:' + fv.id;
         localStorage.setItem(fishSelectedKey, fv.id);
         toast('تم اختيار «' + fv.name + '» في Fish Audio');
+      }));
+      actions.appendChild(actionButton('🎧', 'اختيار في Chatterbox', () => {
+        showScreen('studio');
+        $('ttsEngine').value = 'chatterbox';
+        updateEngineView();
+        $('indexVoiceSelect').value = 'fish:' + fv.id;
+        updateIndexReferenceStatus();
+        toast('تم اختيار «' + fv.name + '» في Chatterbox');
       }));
       actions.appendChild(actionButton('✎', 'تعديل اسم الصوت', () => renameFishVoice(fv)));
       actions.appendChild(actionButton('✕', 'حذف من التطبيق', () => { $('voiceSelect').value = 'fish:' + fv.id; removeFishVoice(); }));
@@ -1232,7 +1232,7 @@ window.AVS_CONFIG = {
     $('signedOutView').hidden = Boolean(state.user);
     $('signedInView').hidden = !state.user;
     if (state.user) $('signedEmail').textContent = state.user.email || state.user.id;
-    $('cloudIndicator').textContent = !cloudAvailable ? 'Chatterbox HF' : state.user ? 'متصل بالسحابة' : 'يتطلب دخول';
+    $('cloudIndicator').textContent = !cloudAvailable ? 'جاهز للعمل' : state.user ? 'متصل بالسحابة' : 'يتطلب دخول';
     $('cloudIndicator').classList.toggle('connected', true);
   }
 
@@ -1460,7 +1460,7 @@ window.AVS_CONFIG = {
     $('checkEngineBtn').addEventListener('click', checkEngine);
 
     const savedEngine = localStorage.getItem(ttsEngineKey);
-    $('ttsEngine').value = savedEngine === 'fish' ? 'fish' : 'chatterbox';
+    $('ttsEngine').value = savedEngine === 'chatterbox' ? 'chatterbox' : 'fish';
     $('ttsEngine').addEventListener('change', updateEngineView);
     updateEngineView();
 
