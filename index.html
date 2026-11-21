@@ -138,14 +138,34 @@
             <button type="button" data-emotion="Sad">☁ حزن</button>
           </div>
 
+          <div id="fishEmotionTools" class="form-card" style="margin:13px 0;padding:13px;gap:8px">
+            <b style="font-size:13px">🎭 أدوات أداء Fish S2.1</b>
+            <label class="inline-note" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="fishEmotionEnabled" checked /> تفعيل توجيهات المشاعر في Fish Audio</label>
+            <label class="field-label" for="fishActingStyle">طريقة الإلقاء (مستقلة عن الشعور)</label>
+            <select id="fishActingStyle">
+              <option value="natural">طبيعي — دون توجيه إضافي</option>
+              <option value="measured">رزين ومتأنٍ</option>
+              <option value="low">صوت منخفض وثقيل</option>
+              <option value="commanding">حازم وآمر</option>
+              <option value="whisper">همس هادئ</option>
+            </select>
+            <label class="field-label" for="fishPauseStyle">الفواصل بين الجمل (تسجيل واحد)</label>
+            <select id="fishPauseStyle">
+              <option value="natural">طبيعية — حسب الترقيم</option>
+              <option value="short">وقفة قصيرة بين الجمل</option>
+              <option value="long">وقفة أطول بين الجمل</option>
+            </select>
+            <p class="inline-note">التوجيهات تُضاف إلى طلب Fish S2.1 فقط ولا تُدخل في نصك المحفوظ. التأثير الفعلي يعتمد على الصوت.</p>
+          </div>
+
           <div id="fishDirectionWrap">
             <label class="field-label" for="performanceDirection">توجيه أداء Fish S2.1 — اختياري</label>
             <textarea id="performanceDirection" rows="2" maxlength="320" spellcheck="false" placeholder="للنص الياباني: توجيه ياباني قصير فقط. أو اترك الحقل فارغًا"></textarea>
             <label class="inline-note" style="display:flex;align-items:flex-start;gap:9px"><input type="checkbox" id="overridePerformancePreset" style="margin-top:4px;flex:none" /> <span>استخدم توجيهي اليدوي فقط، دون وصف الشعور الجاهز.</span></label>
           </div>
 
-          <div class="range-block"><div><label for="intensity">قوة التعبير التمثيلي (Exaggeration)</label><output id="intensityOut">70%</output></div><input type="range" id="intensity" min="0" max="100" value="70" step="5" /></div>
-          <p class="inline-note">كلما رفعت القوة زادت حدة التمثيل والانفعال الدرامي.</p>
+          <div class="range-block"><div><label for="intensity">شدة توجيه الشعور (تقديرية)</label><output id="intensityOut">70%</output></div><input type="range" id="intensity" min="0" max="100" value="70" step="5" /></div>
+          <p class="inline-note">تغيّر هذه القيمة وصف الشعور المرسل إلى Fish؛ ليست نسبة أداء مضمونة من المحرك.</p>
 
           <div id="fishExtraSliders">
             <div class="range-block"><div><label for="volume">مستوى الصوت (dB)</label><output id="volumeOut">0 dB</output></div><input type="range" id="volume" min="-6" max="6" value="0" step="1" /></div>
@@ -495,6 +515,7 @@ window.AVS_CONFIG = {
     $('fishVoiceChooser').hidden = cb;
     $('fishCloneAndCatalog').hidden = cb;
     $('fishDirectionWrap').hidden = cb;
+    $('fishEmotionTools').hidden = cb;
     $('fishExtraSliders').hidden = cb;
     $('chatterboxVoiceChooser').hidden = !cb;
     $('generationResultTitle').textContent = 'اختر النتيجة التي تفضلها';
@@ -864,9 +885,50 @@ window.AVS_CONFIG = {
       ? 'جارٍ الاتصال بـ Chatterbox Multilingual وتوليد النسخة الأولى ثم الثانية بصوت «' + voiceName + '» (قد يستغرق 15–40 ثانية)...'
       : 'جارٍ توليد نسختين عبر Fish Audio بصوت «' + voiceName + '»...';
 
+    // S2.1 accepts open-domain inline [tags]. No native emotion parameter exists.
+    // Compose direction once, retaining native continuous-text synthesis.
+    function fishDirectedText(original) {
+      const raw = String(original || '');
+      if (!$('fishEmotionEnabled').checked) return raw;
+      const custom = $('performanceDirection').value.trim().replace(/[\[\]\r\n]/g, ' ').replace(/\s+/g, ' ').slice(0, 80);
+      const onlyCustom = $('overridePerformancePreset').checked && !!custom;
+      const intensity = Number($('intensity').value);
+      const emotions = {
+        Challenge: 'confident',
+        Majestic: 'calm, authoritative',
+        Angry: 'angry',
+        Sarcastic: 'sarcastic',
+        Calm: 'calm',
+        Sad: 'sad'
+      };
+      const delivery = {
+        natural: '',
+        measured: 'slow, deliberate delivery',
+        low: 'low voice',
+        commanding: 'firm, commanding tone',
+        whisper: 'whispering'
+      };
+      let emotion = !onlyCustom && intensity > 0 ? (emotions[state.emotion] || '') : '';
+      if (emotion && intensity <= 20) emotion = 'very subtly ' + emotion;
+      else if (emotion && intensity <= 40) emotion = 'slightly ' + emotion;
+      else if (emotion && intensity <= 60) emotion = 'moderately ' + emotion;
+      else if (emotion && intensity >= 90) emotion = 'intensely ' + emotion;
+      else if (emotion && intensity >= 80) emotion = 'strongly ' + emotion;
+      const cueParts = onlyCustom ? [custom] : [emotion, delivery[$('fishActingStyle').value] || '', custom].filter(Boolean);
+      const cue = cueParts.length ? '[' + cueParts.join(', ') + '] ' : '';
+      let spoken = raw;
+      const pause = $('fishPauseStyle').value;
+      if (pause === 'short' || pause === 'long') {
+        const tag = pause === 'short' ? '[short pause]' : '[long pause]';
+        spoken = spoken.replace(/([。！？!?])\s*(?=\S)/g, '$1 ' + tag + ' ');
+      }
+      if (cue.length + spoken.length > 1200) throw new Error('النص مع توجيهات المشاعر تجاوز 1200 حرف. قصّر النص أو أوقف أدوات المشاعر.');
+      return cue + spoken;
+    }
+
     const createFishData = take => {
       const data = new FormData();
-      data.set('text', text);
+      data.set('text', fishDirectedText(text));
       data.set('language', state.language);
       data.set('emotion', state.emotion);
       data.set('intensity', $('intensity').value);
@@ -1299,6 +1361,23 @@ window.AVS_CONFIG = {
     });
   }
   updateTakeDescriptions();
+
+  const fishActingKeys = [
+    ['fishEmotionEnabled','avs_fish_emotion_active_v1','true'],
+    ['fishActingStyle','avs_fish_acting_style_v1','natural'],
+    ['fishPauseStyle','avs_fish_pause_style_v1','natural']
+  ];
+  for (const [id,key,fallback] of fishActingKeys) {
+    const el = $(id);
+    try {
+      const saved=localStorage.getItem(key)||fallback;
+      if(el.type==='checkbox')el.checked=saved==='true';
+      else if([...el.options].some(option=>option.value===saved))el.value=saved;
+    }catch(_){}
+    el.addEventListener('change',()=>{
+      try{localStorage.setItem(key,el.type==='checkbox'?String(el.checked):el.value);}catch(_){}
+    });
+  }
 
   const performanceDirectionKey = 'avs_performance_direction_v1';
   try { $('performanceDirection').value = localStorage.getItem(performanceDirectionKey) || ''; } catch (_) {}
